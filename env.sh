@@ -52,6 +52,7 @@ if [ $ENV_NAME = "bbtt" ] ; then
         run_cmd eval `scramv1 runtime -sh`
     fi
     run_cmd cd ../..
+    export PYTHONPATH=$PWD/$PYTHONPATH
 elif [ $ENV_NAME = "hh" ] ; then
     if ! [ -f inference/.installed ] ; then
         echo "Installing an environment for the HH statistical inference..."

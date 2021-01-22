@@ -1,0 +1,25 @@
+#ana_name: hbbhtt
+ana_name: hbbhtautau
+var_name: DNN
+era: 13TeV
+mass: 125
+ggHH_selection: mh
+vbf_selection: mh
+years:
+    - 2016
+    # - 2017
+    # - 2018
+channels:
+    # - eTau
+    # - muTau
+    - tauTau
+vbf_classes:
+    - GGF
+    - VBF
+    - TT
+    # - ttH
+    - DY
+ggHH_categories:
+    - res1b
+    - res2b
+    - boosted
