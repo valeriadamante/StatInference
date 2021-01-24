@@ -1,0 +1,16 @@
+dir_reject_filters:
+    - '.*_OS_antiiso$'
+    - '.*_SS_antiiso$'
+    - '.*_SS_iso$'
+hist_reject_filters:
+    - 'ggRadion.*'
+    - 'ggGraviton.*'
+hist_rename_rules:
+    - [ '(.*DY_[0-2]b)(_0JPt)(.*)', '\1_1Pt\3' ]
+    - [ '(.*DY_[0-2]b)(_10JPt)(.*)', '\1_2Pt\3' ]
+    - [ '(.*DY_[0-2]b)(_50JPt)(.*)', '\1_3Pt\3' ]
+    - [ '(.*DY_[0-2]b)(_80JPt)(.*)', '\1_4Pt\3' ]
+    - [ '(.*DY_[0-2]b)(_110JPt)(.*)', '\1_5Pt\3' ]
+    - [ '(.*DY_[0-2]b)(_190JPt)(.*)', '\1_6Pt\3' ]
+    - [ '(.*)(_hbbhtautau)(.*)', '\1_hbbhtt\3' ]
+    - [ '(.*)(_13TeV)(.*)', '\1\3' ]

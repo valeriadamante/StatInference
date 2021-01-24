@@ -40,6 +40,8 @@ class HarvesterInterface:
             ch_cat = self.GetCHCat(year, channel, cat, return_index=False)
             self.ch_categories.append(ch_cat)
 
+        self.signals = [ '{}_{}'.format(s, self.ana) for s in self.cfg["signals"] ]
+
     def GetCHChannel(self, year, channel):
         return '{}_{}'.format(channel, year)
 
@@ -70,5 +72,14 @@ class HarvesterInterface:
         ch_channel = self.GetCHChannel(year, channel)
         self.cb.AddObservations(["*"], [self.ana], [self.era], [ch_channel], [ch_cat])
         file_name = self.GetInputFileName(year, channel, category)
-        self.cb.cp().channel([ch_channel]).bin([ch_cat[1]]) \
+        self.cb.cp().process(['data_obs']).channel([ch_channel]).bin([ch_cat[1]]) \
+            .ExtractShapes(file_name, "$BIN/$PROCESS", "$BIN/$PROCESS_$SYSTEMATIC")
+
+    def AddProcess(self, proc, year, channel, category):
+        ch_cat = self.GetCHCat(year, channel, category)
+        ch_channel = self.GetCHChannel(year, channel)
+        is_signal = proc in self.signals
+        self.cb.AddProcesses(["*"], [self.ana], [self.era], [ch_channel], [proc], [ch_cat], is_signal)
+        file_name = self.GetInputFileName(year, channel, category)
+        self.cb.cp().process([proc]).channel([ch_channel]).bin([ch_cat[1]]) \
             .ExtractShapes(file_name, "$BIN/$PROCESS", "$BIN/$PROCESS_$SYSTEMATIC")

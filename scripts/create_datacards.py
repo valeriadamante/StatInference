@@ -15,4 +15,6 @@ hi = HarvesterInterface(args.config, args.input)
 
 for year, channel, category in hi.YCC():
     hi.AddObservations(year, channel, category)
+    for signal in hi.signals:
+        hi.AddProcess(signal, year, channel, category)
 hi.cb.PrintAll()
