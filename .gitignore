@@ -1,4 +1,6 @@
 /CMSSW*
 /inference
 /shapes
+/output
+/datacards
 *.pyc
