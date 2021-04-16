@@ -95,6 +95,8 @@ class Binning:
         edges = edges / step_int_scale
         if edges[-1] != 1:
             edges[-1] = 1
+        if edges[0] != 0:
+            edges[0] = 0
         return Binning(edges)
 
     @staticmethod
