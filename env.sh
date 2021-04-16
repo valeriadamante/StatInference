@@ -2,7 +2,7 @@
 
 if [ $# -ne 1 ] ; then
     echo "Usage: ./env.sh env_name"
-    echo "       env_name = { bbtt | hh }"
+    echo "       env_name = { bbtt | hh | lcg }"
     exit 1
 fi
 
@@ -66,6 +66,8 @@ elif [ $ENV_NAME = "hh" ] ; then
         run_source
     fi
     run_cmd cd ..
+elif [ $ENV_NAME = "lcg" ] ; then
+    source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_99 x86_64-centos7-gcc10-opt
 else
     echo "Unknown environment '$ENV_NAME'. Supported environments: bbtt hh"
     exit 3

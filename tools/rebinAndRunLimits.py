@@ -106,7 +106,7 @@ def FixNegativeContributions(histogram):
         histogram.Scale(original_integral / new_integral)
     return True
 
-def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0):
+def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0, rebin_only=False, other_datacards=[]):
     input_name = os.path.splitext(os.path.basename(input_datacard))[0]
     input_shapes = os.path.splitext(input_datacard)[0] + '.input.root'
     output_datacard = os.path.join(output_dir, input_name + '.txt')
@@ -167,12 +167,16 @@ def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0):
             print("Removing nuissances: {}".format(nuis_str))
         sh_call('remove_parameters.py {} {}'.format(output_datacard, nuis_str),
                 'Error while running remove_parameters.py', verbose)
-
+    if rebin_only:
+        return
     if verbose > 0:
         print("Running limits...")
     version = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    datacards_str = output_datacard
+    if len(other_datacards):
+        datacards_str += ',' + ','.join(other_datacards)
     law_cmd = 'law run UpperLimits --version {} --datacards {} --pois {} --scan-parameters kl,1,1,1' \
-              .format(version, output_datacard, poi)
+              .format(version, datacards_str, poi)
     output = sh_call(law_cmd, "Error while running UpperLimits", verbose)
 
     if verbose > 0:
@@ -195,14 +199,20 @@ if __name__ == '__main__':
     parser.add_argument('--bin-edges', required=True, type=str, help="comma separated bin edges")
     parser.add_argument('--poi', required=False, type=str, default='r', help="parameter of interest")
     parser.add_argument('--verbose', required=False, type=int, default=1, help="verbosity")
+    parser.add_argument('--rebin-only', action='store_true', help="don't run limits, only prepare datacards")
+    parser.add_argument('other_datacards', type=str, nargs='*',
+                        help="list of other datacards to be combined together with the current target")
     args = parser.parse_args()
 
     bin_edges = [ float(b) for b in args.bin_edges.split(',') ]
     if args.verbose > 0:
         print('New bin edges: [ {} ]'.format(', '.join([ str(b) for b in bin_edges ])))
-    limit = GetLimits(args.input, args.output, bin_edges, args.poi, verbose=args.verbose)
-
-    if args.verbose > 0:
-        print('Expected 95% CL limit = {}'.format(limit))
+    limit = GetLimits(args.input, args.output, bin_edges, args.poi, verbose=args.verbose, rebin_only=args.rebin_only,
+                      other_datacards=args.other_datacards)
+    if args.rebin_only:
+        print('Datacars have been prepared')
     else:
-        print(limit)
+        if args.verbose > 0:
+            print('Expected 95% CL limit = {}'.format(limit))
+        else:
+            print(limit)
