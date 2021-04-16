@@ -25,8 +25,11 @@ if args.verbose > 0:
 while True:
     time.sleep(1)
     if os.path.isfile(task_file) and not os.path.isfile(result_file):
-        with open(task_file, 'r') as f:
-            params = json.load(f)
+        try:
+            with open(task_file, 'r') as f:
+                params = json.load(f)
+        except IOError:
+            continue
         bin_edges = params['bin_edges']
         if args.verbose > 0:
             print('Bin edges: [ {} ]'.format(', '.join([ str(b) for b in bin_edges ])))
