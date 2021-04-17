@@ -159,7 +159,8 @@ class BayesianOptimization:
 
         bounds = {}
         for n in range(max_n_bins):
-            bounds['rel_thr_{}'.format(n)] = (min_step, 1.)
+            upper_bound = 1. if n > 0 else 1.5
+            bounds['rel_thr_{}'.format(n)] = (min_step, upper_bound)
 
         self.bounds_transformer = None
         self.optimizer = bayes_opt.BayesianOptimization(f=None, pbounds=bounds, random_state=random_seed, verbose=1)
@@ -217,13 +218,11 @@ class BayesianOptimization:
                     new_bounds[key] = np.array([new_bounds[key][1], new_bounds[key][0]])
                 if new_bounds[key][0] < min_step:
                     new_bounds[key][0] = min_step
-                if new_bounds[key][1] > 1.:
-                    new_bounds[key][1] = 1.
-                # if  new_bounds[key][1] - new_bounds[key][0] <= min_step:
-                #     new_bounds[key][0] = max(min_step, new_bounds[key][0] - min_step)
-                #     new_bounds[key][1] = min(1, new_bounds[key][1] + min_step)
+                upper_bound = 1. if key != 'rel_thr_0' else 1.5
+                if new_bounds[key][1] > upper_bound:
+                    new_bounds[key][1] = upper_bound
                 if np.any(np.isnan(new_bounds[key])):
-                    new_bounds[key] = np.array([min_step, 1.])
+                    new_bounds[key] = np.array([min_step, upper_bound])
             self.optimizer.set_bounds(new_bounds)
 
     def register(self, point, n_edges, exp_limit):
