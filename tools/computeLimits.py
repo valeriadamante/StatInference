@@ -47,11 +47,20 @@ else:
     limits = {}
 
 categories = [ 'res2b', 'res1b', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY', 'boosted' ]
+pois = [ 'r', 'r_qqhh']
 
 for n in range(len(categories)):
     cat_cmb = '_'.join(categories[:n+1])
-    if cat_cmb not in limits:
+
+    if cat_cmb in limits:
+        missing_pois = []
+        for poi in pois:
+            if poi not in limits[cat_cmb]:
+                missing_pois.append(poi)
+    else:
         limits[cat_cmb] = {}
+        missing_pois = pois
+    if len(missing_pois) > 0:
         version = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         datacards = []
         has_all_datacards = True
@@ -64,7 +73,7 @@ for n in range(len(categories)):
         if not has_all_datacards:
             break
         datacards_str = ','.join(datacards)
-        for poi in [ 'r', 'r_qqhh']:
+        for poi in missing_pois:
             law_cmd = 'law run UpperLimits --version {} --datacards {} --pois {} --scan-parameters kl,1,1,1' \
                       .format(version, datacards_str, poi)
             output = sh_call(law_cmd, "Error while running UpperLimits", 2)
@@ -73,6 +82,5 @@ for n in range(len(categories)):
         sh_call(law_cmd + ' --remove-output 2,a ', "Error while removing combine outputs", 2)
 
     print("{} limits: r = {}, r_qqhh = {}".format(cat_cmb, limits[cat_cmb]['r'], limits[cat_cmb]['r_qqhh']))
-
-with open(output_json, 'w') as f:
-    json.dump(limits, f, indent=4)
+    with open(output_json, 'w') as f:
+        json.dump(limits, f, indent=4)
