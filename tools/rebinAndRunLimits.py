@@ -132,6 +132,8 @@ def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0, rebin_only=
     hist_names = [ str(key.GetName()) for key in input_root.GetListOfKeys() ]
     name_regex = re.compile('(.*)_(CMS_.*)(Up|Down)')
 
+    ROOT.TH1.AddDirectory(False)
+
     for hist_name in sorted(hist_names):
         name_match = name_regex.match(hist_name)
         if name_match is not None:
