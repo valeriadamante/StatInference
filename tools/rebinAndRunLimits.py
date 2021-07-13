@@ -40,14 +40,16 @@ def RebinAndFill(new_hist, old_hist):
         return old_min <= new_min and old_max >= new_max
 
     def get_new_bin(old_axis, new_axis, bin_id_old):
-        old_low_edge = old_axis.GetBinLowEdge(bin_id_old)
-        old_up_edge = old_axis.GetBinUpEdge(bin_id_old)
+        old_low_edge = round(old_axis.GetBinLowEdge(bin_id_old), 4)
+        old_up_edge = round(old_axis.GetBinUpEdge(bin_id_old), 4)
         bin_low_new = new_axis.FindFixBin(old_low_edge)
         bin_up_new = new_axis.FindFixBin(old_up_edge)
 
         new_up_edge = new_axis.GetBinUpEdge(bin_low_new)
         if not (bin_low_new == bin_up_new or \
                 abs(old_up_edge - new_up_edge) <= epsilon * abs(old_up_edge + new_up_edge) * 2):
+            old_bins = [ str(old_axis.GetBinLowEdge(n)) for n in range(1, old_axis.GetNbins() + 2)]
+            print('old_bins: [{}]'.format(', '.join(old_bins)))
             raise RuntimeError("Uncompatible bin edges")
         return bin_low_new
 

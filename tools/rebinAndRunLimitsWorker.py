@@ -38,6 +38,7 @@ while True:
         if args.verbose > 0:
             print('Expected 95% CL limit = {}'.format(limit))
         result = {
+            'input_datacard': params['input_datacard'],
             'bin_edges': bin_edges,
             'exp_limit': limit
         }

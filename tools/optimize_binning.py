@@ -11,6 +11,7 @@ import ROOT
 import shutil
 import threading
 import time
+from sortedcontainers import SortedSet
 
 min_step = 0.001
 min_step_digits = -int(math.log10(min_step))
@@ -20,6 +21,7 @@ max_value_int = step_int_scale
 def HistToNumpy(hist):
     epsilon = 1e-7
     x = np.zeros(max_value_int)
+    x_err2 = np.zeros(max_value_int)
     if hist.GetNbinsX() != max_value_int:
         raise RuntimeError("Inconsistent number of bins")
     for n in range(max_value_int):
@@ -27,38 +29,106 @@ def HistToNumpy(hist):
                 or abs(hist.GetBinLowEdge(n + 2) - (n + 1) * min_step) > epsilon:
             raise RuntimeError("Inconsistent binning")
         x[n] = hist.GetBinContent(n + 1)
-    return x
+        x_err2[n] = hist.GetBinError(n + 1) ** 2
+    return x, x_err2
 
 def arrayToStr(a):
     return '[ ' + ', '.join([ str(x) for x in a ]) + ' ]'
 
-def ExtractYields(input_shapes, ref_bkgs, nonbkg_regex):
-    ref_bkg_yields = {}
-    total_bkg_yields = np.zeros(max_value_int)
-    for ref_bkg_name in ref_bkgs:
-        ref_bkg_yields[ref_bkg_name] = np.zeros(max_value_int)
+class Yields:
+    def __init__(self, ref_bkgs, n_bins):
+        self.n_bins = n_bins
+        self.ref_bkgs = ref_bkgs
+        self.yields = {}
+        self.processes = SortedSet([ 'total' ] + list(ref_bkgs.keys()))
+        self.input_processes = SortedSet()
+        self.unc_variations = SortedSet([''])
+
+    def addProcess(self, process, yields, err2, unc_variation):
+        names = [ 'total' ]
+        for ref_bkg_name, ref_bkg_regex in self.ref_bkgs.items():
+            if ref_bkg_regex.match(process) is not None:
+                names.append(ref_bkg_name)
+        if process not in self.input_processes:
+            self.input_processes.add(process)
+        for name in names:
+            if unc_variation not in self.unc_variations:
+                self.unc_variations.add(unc_variation)
+            key = (name, unc_variation)
+            if key not in self.yields:
+                self.yields[key] = [ np.zeros(self.n_bins), np.zeros(self.n_bins) ]
+            self.yields[key][0] += yields
+            self.yields[key][1] += err2
+
+    def test(self, start, stop, yield_thr):
+        ref_bkg_thr = 1e-7
+        total_bkg_thr = 0.03 #0.18
+        total_yield = {}
+        for process in self.processes:
+            is_ref = process != 'total'
+            for unc_variation in self.unc_variations:
+                is_central = unc_variation == ''
+                key = (process, unc_variation)
+                if key not in self.yields:
+                    return False, -1
+                if is_ref:
+                    thr = ref_bkg_thr
+                elif is_central:
+                    thr = max(total_bkg_thr, yield_thr)
+                else:
+                    thr = total_bkg_thr
+                sum = np.sum(self.yields[key][0][start:stop])
+                if sum < thr:
+                    return False, -1
+                if not is_ref:
+                    err2 = np.sum(self.yields[key][1][start:stop])
+                    total_yield[unc_variation] = (sum, math.sqrt(err2))
+        rel_err = total_yield[''][1] / total_yield[''][0]
+        max_delta = 0
+        for unc_variation in self.unc_variations:
+            max_delta = max(max_delta, abs(total_yield[''][0] - total_yield[unc_variation][0]))
+        if rel_err <= 0.25 or (rel_err <= 0.5 and max_delta / total_yield[''][0] < 0.1):
+            return True, total_yield[''][0]
+        return False, -1
+
+    def printSummary(self):
+        print('total = {}'.format(' + '.join(self.input_processes)))
+        for unc_variation in self.unc_variations:
+            unc_name = unc_variation if len(unc_variation) > 0 else 'central'
+            print(unc_name)
+            for process in self.processes:
+                x = 0
+                err = 0
+                key = (process, unc_variation)
+                if key in self.yields:
+                    x = np.sum(self.yields[key][0])
+                    err = math.sqrt(np.sum(self.yields[key][1]))
+                print('\t{}: {:.3f} +/- {:.3f}'.format(process, x, err))
+
+def ExtractYields(input_shapes, ref_bkgs, nonbkg_regex, ignore_variations_regex):
+    yields = Yields(ref_bkgs, max_value_int)
 
     input_root = ROOT.TFile.Open(input_shapes)
     hist_names = [ str(key.GetName()) for key in input_root.GetListOfKeys() ]
-    nuis_name_regex = re.compile('(.*)_(CMS_.*)(Up|Down)')
+    nuis_name_regex = re.compile('(.*)_(CMS_.*(Up|Down))')
     for hist_name in sorted(hist_names):
-        if nuis_name_regex.match(hist_name) is not None or nonbkg_regex.match(hist_name) is not None:
+        if nonbkg_regex.match(hist_name) is not None:
             continue
-        ref_bkg = None
-        for ref_bkg_name, ref_bkg_regex in ref_bkgs.items():
-            if ref_bkg_regex.match(hist_name) is not None:
-                ref_bkg = ref_bkg_name
-        hist = input_root.Get(hist_name)
-        bkg_yield = HistToNumpy(hist)
-        total_bkg_yields += bkg_yield
-        report_str = '{} added to the total bkg contributions'.format(hist_name)
-        if ref_bkg is not None:
-            ref_bkg_yields[ref_bkg] += bkg_yield
-            report_str += ' and {} contributions'.format(ref_bkg)
-        print(report_str)
-    input_root.Close()
-    return ref_bkg_yields, total_bkg_yields
+        nuis_match = nuis_name_regex.match(hist_name)
+        if nuis_match is not None:
+            process = nuis_match.groups()[0]
+            unc_variation = nuis_match.groups()[1]
+        else:
+            process = hist_name
+            unc_variation = ''
+        if ignore_variations_regex.match(unc_variation):
+            continue
 
+        hist = input_root.Get(hist_name)
+        hist_yield, hist_err2 = HistToNumpy(hist)
+        yields.addProcess(process, hist_yield, hist_err2, unc_variation)
+    input_root.Close()
+    return yields
 
 class Binning:
     def __init__(self, edges):
@@ -66,27 +136,20 @@ class Binning:
         self.exp_limit = None
 
     @staticmethod
-    def fromRelativeThresholds(rel_thrs, ref_bkg_yields, total_bkg_yields, ref_bkg_thr, total_bkg_thr):
-        def ref_bkg_ok(start, stop):
-            for bkg_name, bkg_yields in ref_bkg_yields.items():
-                if np.sum(bkg_yields[start:stop]) <= ref_bkg_thr:
-                    return False
-            return True
-
-        def total_bkg_ok(start, stop):
-            return np.sum(total_bkg_yields[start:stop]) > total_bkg_thr
-
+    def fromRelativeThresholds(rel_thrs, bkg_yields):
         edges = [ max_value_int ]
+        prev_yield = -1
         for rel_thr in rel_thrs:
             edge_up = edges[-1]
             edge_down = max(edge_up - int(round(rel_thr * step_int_scale)), 0)
             all_ok = False
             while edge_down >= 0:
-                all_ok = ref_bkg_ok(edge_down, edge_up) and total_bkg_ok(edge_down, edge_up)
+                all_ok, new_yield = bkg_yields.test(edge_down, edge_up, prev_yield)
                 if all_ok: break
                 edge_down -= 1
             if all_ok:
                 edges.append(edge_down)
+                prev_yield = new_yield
             if edge_down == 0: break
         if len(edges) == 1:
             edges.append(0)
@@ -135,20 +198,17 @@ class Binning:
 
 
 class BayesianOptimization:
-    def __init__(self, max_n_bins, working_area, acq, kappa, xi, input_datacard, poi,
-                 ref_bkg_yields, total_bkg_yields, ref_bkg_thr, total_bkg_thr, input_queue_size, random_seed=12345,
-                 other_datacards=[]):
+    def __init__(self, max_n_bins, working_area, workers_dir, acq, kappa, xi, input_datacard, poi,
+                 bkg_yields, input_queue_size, random_seed=12345, other_datacards=[]):
         self.max_n_bins = max_n_bins
         self.binnings = []
         self.best_binning = None
         self.working_area = working_area
+        self.workers_dir = workers_dir
         self.log_output = os.path.join(working_area, 'results.json')
         self.input_datacard = input_datacard
         self.poi = poi
-        self.ref_bkg_yields = ref_bkg_yields
-        self.total_bkg_yields = total_bkg_yields
-        self.ref_bkg_thr = ref_bkg_thr
-        self.total_bkg_thr = total_bkg_thr
+        self.bkg_yields = bkg_yields
         self.other_datacards = other_datacards
         self.best_binning_split = False
         self.input_queue = Queue(input_queue_size)
@@ -172,6 +232,8 @@ class BayesianOptimization:
 
         if not os.path.isdir(working_area):
             os.mkdir(working_area)
+        if not os.path.isdir(workers_dir):
+            os.mkdir(workers_dir)
         if os.path.isfile(self.log_output):
             with open(self.log_output, 'r') as f:
                 prev_binnings = json.loads('[' + ', '.join(f.readlines()) + ']')
@@ -245,8 +307,7 @@ class BayesianOptimization:
     def addSuggestion(self, edges):
         suggested_binning = Binning(np.array(edges))
         rel_thrs = suggested_binning.getRelativeThresholds(self.max_n_bins)
-        binning = Binning.fromRelativeThresholds(rel_thrs, self.ref_bkg_yields, self.total_bkg_yields,
-                                                 self.ref_bkg_thr, self.total_bkg_thr)
+        binning = Binning.fromRelativeThresholds(rel_thrs, self.bkg_yields)
         if self.findEquivalent(binning, False) is None:
             point = binning.toPoint(self.max_n_bins)
             self.suggestions.append(point)
@@ -278,8 +339,8 @@ class BayesianOptimization:
         if not self.best_binning_split:
             self.print('Splitting best binning...')
             n_best = len(self.best_binning.edges)
+            self.optimizer_lock.acquire()
             if n_best - 2 < self.max_n_bins:
-                self.optimizer_lock.acquire()
                 for k in range(n_best - 1):
                     edges = np.zeros(n_best + 1)
                     edges[0:k+1] = self.best_binning.edges[0:k+1]
@@ -288,7 +349,13 @@ class BayesianOptimization:
                         edges[k+1] = self.best_binning.edges[k] \
                                      + (self.best_binning.edges[k+1] - self.best_binning.edges[k]) * delta_edge
                         self.addSuggestion(edges)
-                self.optimizer_lock.release()
+            if n_best > 2:
+                for k in range(1, n_best):
+                    edges = np.zeros(n_best - 1)
+                    edges[0:k] = self.best_binning.edges[0:k]
+                    edges[k:] = self.best_binning.edges[k+1:]
+                    self.addSuggestion(edges)
+            self.optimizer_lock.release()
             self.best_binning_split = True
         self.binning_lock.release()
 
@@ -336,8 +403,7 @@ class BayesianOptimization:
                 rel_thrs[k] = point['rel_thr_{}'.format(k)]
             self.print('rel_thrs: {}'.format(arrayToStr(rel_thrs)))
 
-            binning = Binning.fromRelativeThresholds(rel_thrs, self.ref_bkg_yields, self.total_bkg_yields,
-                                                     self.ref_bkg_thr, self.total_bkg_thr)
+            binning = Binning.fromRelativeThresholds(rel_thrs, self.bkg_yields)
             equivalent_binning = self.findEquivalent(binning)
             if equivalent_binning is None:
                 n = 0
@@ -365,8 +431,8 @@ class BayesianOptimization:
     def JobDispatcher(self):
         while True:
             time.sleep(1)
-            for worker_dir in os.listdir(self.working_area):
-                worker_dir = os.path.join(self.working_area, worker_dir)
+            for worker_dir in os.listdir(self.workers_dir):
+                worker_dir = os.path.join(self.workers_dir, worker_dir)
                 if not os.path.isdir(worker_dir): continue
                 task_file = os.path.join(worker_dir, 'task.txt')
                 task_file_tmp = os.path.join(worker_dir, '.task.txt')
@@ -375,14 +441,15 @@ class BayesianOptimization:
                     if os.path.isfile(result_file):
                         with open(result_file, 'r') as f:
                             result = json.load(f)
-                        binning = Binning.fromEntry(result)
-                        self.clearOpenRequest(binning)
-                        if self.findEquivalent(binning) is None:
-                            point = binning.toPoint(self.max_n_bins)
-                            self.addNewBinning(binning)
-                            with open(self.log_output, 'a') as f:
-                                f.write(json.dumps(result) + '\n')
-                            self.register(point, len(binning.edges), binning.exp_limit)
+                        if result['input_datacard'] == self.input_datacard:
+                            binning = Binning.fromEntry(result)
+                            self.clearOpenRequest(binning)
+                            if self.findEquivalent(binning) is None:
+                                point = binning.toPoint(self.max_n_bins)
+                                self.addNewBinning(binning)
+                                with open(self.log_output, 'a') as f:
+                                    f.write(json.dumps(result) + '\n')
+                                self.register(point, len(binning.edges), binning.exp_limit)
 
                         os.remove(task_file)
                         os.remove(result_file)
@@ -425,6 +492,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Find optimal binning that minimises the expected limits.')
     parser.add_argument('--input', required=True, type=str, help="input datacard")
     parser.add_argument('--output', required=True, type=str, help="output directory")
+    parser.add_argument('--workers-dir', required=True, type=str, help="output directory for workers results")
     parser.add_argument('--max-n-bins', required=True, type=int, help="maximum number of bins")
     parser.add_argument('--poi', required=False, type=str, default='r', help="parameter of interest")
     parser.add_argument('--verbosity', required=False, type=int, default=1, help="verbosity")
@@ -440,21 +508,22 @@ if __name__ == '__main__':
     other_datacards = [ os.path.abspath(p) for p in args.other_datacards ]
 
     ref_bkgs = {
-        'DY': re.compile('^DY.*'),
+        'DY': re.compile('^DY$'),
         'TT': re.compile('^TT$'),
     }
 
-    nonbkg_regex = re.compile('(data_obs|^ggHH.*|^qqHH.*)')
-
-    ref_bkg_yields, total_bkg_yields = ExtractYields(input_shapes, ref_bkgs, nonbkg_regex)
+    nonbkg_regex = re.compile('(data_obs|^ggHH.*|^qqHH.*|^DY_[0-2]b.*)')
+    ignore_unc_variations = re.compile('(CMS_bbtt_201[6-8]_DYSFunc[0-9]+|CMS_bbtt_.*_QCDshape)(Up|Down)')
+    print("Extracting yields for background processes...")
+    bkg_yields = ExtractYields(input_shapes, ref_bkgs, nonbkg_regex, ignore_unc_variations)
+    bkg_yields.printSummary()
     bo = BayesianOptimization(max_n_bins=args.max_n_bins,
                               working_area=args.output,
+                              workers_dir=args.workers_dir,
                               acq='ucb', kappa=2.57, xi=0.1,
                               input_datacard=input_datacard,
                               poi=args.poi,
-                              ref_bkg_yields=ref_bkg_yields,
-                              total_bkg_yields=total_bkg_yields,
-                              ref_bkg_thr=1e-7, total_bkg_thr=0.18,
+                              bkg_yields=bkg_yields,
                               input_queue_size=2, random_seed=None,
                               other_datacards=other_datacards)
     bo.maximize(20)

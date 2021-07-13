@@ -73,7 +73,8 @@ else
     exit 3
 fi
 
-echo "Starting new $SHELL ..."
-$SHELL
-
-echo "Back to the original environment."
+if [ $SHELL = "/bin/zsh" ] ; then
+    echo "Starting new $SHELL ..."
+    $SHELL
+    echo "Back to the original environment."
+fi

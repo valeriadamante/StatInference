@@ -46,7 +46,8 @@ if os.path.exists(output_json):
 else:
     limits = {}
 
-categories = [ 'res2b', 'res1b', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY', 'boosted' ]
+#categories = [ 'res2b', 'res1b', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY', 'boosted' ]
+categories = [ 'res2b', 'res1b', 'boosted', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY' ]
 pois = [ 'r', 'r_qqhh']
 
 for n in range(len(categories)):
