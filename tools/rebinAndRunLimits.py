@@ -148,7 +148,7 @@ def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0, rebin_only=
         hist_new = ROOT.TH1F(hist_name, hist_orig.GetTitle(), bin_edges_v.size() - 1, bin_edges_v.data())
         RebinAndFill(hist_new, hist_orig)
         if FixNegativeContributions(hist_new):
-            output_root.WriteTObject(hist_new, hist_name)
+            output_root.WriteTObject(hist_new, hist_name, 'Overwrite')
         else:
             if is_central:
                 processes_to_remove.append(process_name)
@@ -179,8 +179,8 @@ def GetLimits(input_datacard, output_dir, bin_edges, poi, verbose=0, rebin_only=
     datacards_str = output_datacard
     if len(other_datacards):
         datacards_str += ',' + ','.join(other_datacards)
-    law_cmd = 'law run UpperLimits --version {} --datacards {} --pois {} --scan-parameters kl,1,1,1' \
-              .format(version, datacards_str, poi)
+    law_cmd = 'law run UpperLimits --version {} --hh-model {} --datacards {} --pois {} --scan-parameters {}' \
+              .format(version, 'hh_model.model_default', datacards_str, poi, 'kl,1,1,1')
     output = sh_call(law_cmd, "Error while running UpperLimits", verbose)
 
     if verbose > 0:

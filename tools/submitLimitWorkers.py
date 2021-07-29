@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser(description='Submit rebinAndRunLimitsWorker job
 parser.add_argument('--output', required=True, type=str, help="output directory")
 parser.add_argument('--channel', required=True, type=str, help="channel")
 parser.add_argument('--n-workers', required=True, type=int, help="number of worker jobs to submit")
+parser.add_argument('--max-runtime', required=False, type=float, default=24, help="max runtime in hours")
 parser.add_argument('--verbose', required=False, type=int, default=1, help="verbosity")
 args = parser.parse_args()
 
@@ -24,14 +25,16 @@ with open(script_file, 'w') as f:
     f.write(run_script)
 os.chmod(script_file, 0o744)
 
+max_runtime_seconds = int(args.max_runtime * 60 * 60)
+
 condor_job = '''
 executable              = {0}
 log                     = {1}/worker.$(ClusterId).$(ProcId).log
 output                  = {1}/worker.$(ClusterId).$(ProcId).out
 error                   = {1}/worker.$(ClusterId).$(ProcId).err
-+JobFlavour             = "tomorrow"
-queue {2}
-'''.format(script_file, workers_output, args.n_workers)
++MaxRuntime             = {2}
+queue {3}
+'''.format(script_file, workers_output, max_runtime_seconds, args.n_workers)
 
 sub_file = os.path.join(workers_output, 'worker.sub')
 with open(sub_file, 'w') as f:

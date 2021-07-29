@@ -12,6 +12,7 @@ import shutil
 import threading
 import time
 from sortedcontainers import SortedSet
+import distutils.util
 
 min_step = 0.001
 min_step_digits = -int(math.log10(min_step))
@@ -43,6 +44,13 @@ class Yields:
         self.processes = SortedSet([ 'total' ] + list(ref_bkgs.keys()))
         self.input_processes = SortedSet()
         self.unc_variations = SortedSet([''])
+        self.ref_bkg_thr = 1e-7
+        self.total_bkg_thr = 0.03 #0.18
+        self.consider_non_central = True
+        self.monotonicity_relax_thr = 10.
+        self.rel_err_thr = 0.5
+        self.rel_err_relax_thr = 1.
+        self.rel_unc_variation_thr = 0.2
 
     def addProcess(self, process, yields, err2, unc_variation):
         names = [ 'total' ]
@@ -61,22 +69,21 @@ class Yields:
             self.yields[key][1] += err2
 
     def test(self, start, stop, yield_thr):
-        ref_bkg_thr = 1e-7
-        total_bkg_thr = 0.03 #0.18
         total_yield = {}
         for process in self.processes:
             is_ref = process != 'total'
             for unc_variation in self.unc_variations:
                 is_central = unc_variation == ''
+                if not is_central and not self.consider_non_central: continue
                 key = (process, unc_variation)
                 if key not in self.yields:
                     return False, -1
                 if is_ref:
-                    thr = ref_bkg_thr
+                    thr = self.ref_bkg_thr
                 elif is_central:
-                    thr = max(total_bkg_thr, yield_thr)
+                    thr = min(max(self.total_bkg_thr, yield_thr), self.monotonicity_relax_thr)
                 else:
-                    thr = total_bkg_thr
+                    thr = self.total_bkg_thr
                 sum = np.sum(self.yields[key][0][start:stop])
                 if sum < thr:
                     return False, -1
@@ -85,9 +92,11 @@ class Yields:
                     total_yield[unc_variation] = (sum, math.sqrt(err2))
         rel_err = total_yield[''][1] / total_yield[''][0]
         max_delta = 0
-        for unc_variation in self.unc_variations:
-            max_delta = max(max_delta, abs(total_yield[''][0] - total_yield[unc_variation][0]))
-        if rel_err <= 0.25 or (rel_err <= 0.5 and max_delta / total_yield[''][0] < 0.1):
+        if self.consider_non_central:
+            for unc_variation in self.unc_variations:
+                max_delta = max(max_delta, abs(total_yield[''][0] - total_yield[unc_variation][0]))
+        if rel_err <= self.rel_err_thr or (self.consider_non_central and rel_err <= self.rel_err_relax_thr \
+                                           and max_delta / total_yield[''][0] < self.rel_unc_variation_thr):
             return True, total_yield[''][0]
         return False, -1
 
@@ -495,6 +504,8 @@ if __name__ == '__main__':
     parser.add_argument('--workers-dir', required=True, type=str, help="output directory for workers results")
     parser.add_argument('--max-n-bins', required=True, type=int, help="maximum number of bins")
     parser.add_argument('--poi', required=False, type=str, default='r', help="parameter of interest")
+    parser.add_argument('--params', required=False, type=str, default=None,
+                        help="algorithm parameters in format param1=value1,param2=value2 ...")
     parser.add_argument('--verbosity', required=False, type=int, default=1, help="verbosity")
     parser.add_argument('other_datacards', type=str, nargs='*',
                         help="list of other datacards to be combined together with the current target")
@@ -507,6 +518,15 @@ if __name__ == '__main__':
 
     other_datacards = [ os.path.abspath(p) for p in args.other_datacards ]
 
+    param_dict = {}
+    if args.params is not None:
+        params = args.params.split(',')    
+        for param in params:
+            p = param.split('=')
+            if len(p) != 2:
+                raise RuntimeError('invalid parameter definition "{}"'.format(param))
+            param_dict[p[0]] = p[1]
+
     ref_bkgs = {
         'DY': re.compile('^DY$'),
         'TT': re.compile('^TT$'),
@@ -517,6 +537,19 @@ if __name__ == '__main__':
     print("Extracting yields for background processes...")
     bkg_yields = ExtractYields(input_shapes, ref_bkgs, nonbkg_regex, ignore_unc_variations)
     bkg_yields.printSummary()
+
+    for name,value in param_dict.items():
+        if not hasattr(bkg_yields, name):
+            raise RuntimeError('Unknown parameter "{}"'.format(name))
+        def_value = getattr(bkg_yields, name)
+        def_value_type = type(def_value)
+        if def_value_type == bool:
+            new_value = bool(distutils.util.strtobool(value))
+        else:
+            new_value = def_value_type(value)
+        print("Setting {} = {}".format(name, new_value))
+        setattr(bkg_yields, name, new_value)
+
     bo = BayesianOptimization(max_n_bins=args.max_n_bins,
                               working_area=args.output,
                               workers_dir=args.workers_dir,

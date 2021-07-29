@@ -11,6 +11,11 @@ parser.add_argument('--input', required=True, type=str, help="input directory")
 parser.add_argument('--channel', required=True, type=str, help="channel_year")
 parser.add_argument('--output', required=True, type=str, help="output directory")
 parser.add_argument('--max-n-bins', required=False, type=int, default=20, help="maximum number of bins")
+parser.add_argument('--params', required=False, type=str, default=None,
+                    help="algorithm parameters in format param1=value1,param2=value2 ...")
+parser.add_argument('--categories', required=False, type=str,
+       default='res2b:r,res1b:r,boosted:r,classVBF:r_qqhh,classGGF:r,classttH:r_qqhh,classTT:r_qqhh,classDY:r_qqhh',
+       help="comma separated list of categories and pois: cat1:poi1,cat2:poi2 ...")
 parser.add_argument('--verbose', required=False, type=int, default=2, help="verbosity level")
 args = parser.parse_args()
 
@@ -38,16 +43,10 @@ def getBestBinning(log_file):
             best_binning = binning
     return best_binning
 
-categories = [
-    [ 'res2b', 'r' ],
-    [ 'res1b', 'r' ],
-    [ 'boosted', 'r' ],
-    [ 'classVBF', 'r_qqhh' ],
-    [ 'classGGF', 'r' ],
-    [ 'classttH', 'r_qqhh' ],
-    [ 'classTT', 'r_qqhh' ],
-    [ 'classDY', 'r_qqhh' ],
-]
+categories = []
+for cat_entry in args.categories.split(','):
+    category, poi = cat_entry.split(':')
+    categories.append([category, poi])
 
 output_dir = os.path.join(args.output, args.channel)
 workers_dir = os.path.join(output_dir, 'workers')
@@ -80,6 +79,8 @@ for cat_index in range(first_cat_index, len(categories)):
 
     opt_cmd = "python tools/optimize_binning.py --input {} --output {} --workers-dir {} --max-n-bins {} --poi {}" \
               .format(input_card, cat_dir, workers_dir, args.max_n_bins, poi)
+    if args.params is not None:
+        opt_cmd += ' --params {} '.format(args.params)
     for cat_idx in range(cat_index):
         cat = categories[cat_idx][0]
         other_cat_file = '{}/hh_{}_{}_13TeV.txt'.format(best_dir, cat, args.channel)

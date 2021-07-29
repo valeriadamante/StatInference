@@ -48,7 +48,7 @@ else:
 
 #categories = [ 'res2b', 'res1b', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY', 'boosted' ]
 categories = [ 'res2b', 'res1b', 'boosted', 'classVBF', 'classGGF', 'classttH', 'classTT', 'classDY' ]
-pois = [ 'r', 'r_qqhh']
+pois = [ 'r', 'r_qqhh' ]
 
 for n in range(len(categories)):
     cat_cmb = '_'.join(categories[:n+1])
@@ -75,8 +75,8 @@ for n in range(len(categories)):
             break
         datacards_str = ','.join(datacards)
         for poi in missing_pois:
-            law_cmd = 'law run UpperLimits --version {} --datacards {} --pois {} --scan-parameters kl,1,1,1' \
-                      .format(version, datacards_str, poi)
+            law_cmd = 'law run UpperLimits --version {} --hh-model {} --datacards {} --pois {} --scan-parameters {}' \
+                      .format(version, 'hh_model.model_default', datacards_str, poi, 'kl,1,1,1')
             output = sh_call(law_cmd, "Error while running UpperLimits", 2)
             limits[cat_cmb][poi] =  extractLimits(output, poi)
 
