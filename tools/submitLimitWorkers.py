@@ -5,6 +5,7 @@ import subprocess
 parser = argparse.ArgumentParser(description='Submit rebinAndRunLimitsWorker jobs to HTCondor.')
 parser.add_argument('--output', required=True, type=str, help="output directory")
 parser.add_argument('--channel', required=True, type=str, help="channel")
+parser.add_argument('--suffix', required=False, type=str, default='', help="suffix to be added to the batch name")
 parser.add_argument('--n-workers', required=True, type=int, help="number of worker jobs to submit")
 parser.add_argument('--max-runtime', required=False, type=float, default=24, help="max runtime in hours")
 parser.add_argument('--verbose', required=False, type=int, default=1, help="verbosity")
@@ -40,4 +41,4 @@ sub_file = os.path.join(workers_output, 'worker.sub')
 with open(sub_file, 'w') as f:
     f.write(condor_job)
 
-subprocess.call(['condor_submit -batch-name {} {}'.format(args.channel, sub_file)], shell=True)
+subprocess.call(['condor_submit -batch-name {} {}'.format(args.channel + args.suffix, sub_file)], shell=True)

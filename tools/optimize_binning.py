@@ -47,8 +47,8 @@ class Yields:
         self.ref_bkg_thr = 1e-7
         self.total_bkg_thr = 0.03 #0.18
         self.consider_non_central = True
-        self.monotonicity_relax_thr = 10.
-        self.rel_err_thr = 0.5
+        self.monotonicity_relax_thr = 0.25
+        self.rel_err_thr = 1.
         self.rel_err_relax_thr = 1.
         self.rel_unc_variation_thr = 0.2
 
@@ -76,20 +76,25 @@ class Yields:
                 is_central = unc_variation == ''
                 if not is_central and not self.consider_non_central: continue
                 key = (process, unc_variation)
+                sum = np.sum(self.yields[key][0][start:stop])
+                err2 = np.sum(self.yields[key][1][start:stop])
+                err = math.sqrt(err2)
+
                 if key not in self.yields:
                     return False, -1
                 if is_ref:
                     thr = self.ref_bkg_thr
                 elif is_central:
-                    thr = min(max(self.total_bkg_thr, yield_thr), self.monotonicity_relax_thr)
+                    if err / sum <= self.monotonicity_relax_thr:
+                        thr = self.total_bkg_thr
+                    else:
+                        thr = max(self.total_bkg_thr, yield_thr)
                 else:
                     thr = self.total_bkg_thr
-                sum = np.sum(self.yields[key][0][start:stop])
                 if sum < thr:
                     return False, -1
                 if not is_ref:
-                    err2 = np.sum(self.yields[key][1][start:stop])
-                    total_yield[unc_variation] = (sum, math.sqrt(err2))
+                    total_yield[unc_variation] = (sum, err)
         rel_err = total_yield[''][1] / total_yield[''][0]
         max_delta = 0
         if self.consider_non_central:
@@ -404,6 +409,7 @@ class BayesianOptimization:
     def PointGenerator(self, n_eq_steps):
         n = 0
         utility_index = 0
+        open_request_sleep = 1
         while n < n_eq_steps:
             point = self.suggest(utility_index)
 
@@ -422,9 +428,11 @@ class BayesianOptimization:
                     self.input_queue.put(binning)
                     self.addOpenRequest(binning)
                     utility_index = 0
+                    open_request_sleep = 1
                 else:
                     self.print('Open request for binning found: {}'.format(arrayToStr(open_request.edges)))
-                    time.sleep(1)
+                    time.sleep(open_request_sleep)
+                    open_request_sleep = open_request_sleep * 2
                     utility_index = (utility_index + 1) % len(self.utilities)
             else:
                 self.print('Equivalent binnig found: {}'.format(arrayToStr(equivalent_binning.edges)))
@@ -520,7 +528,7 @@ if __name__ == '__main__':
 
     param_dict = {}
     if args.params is not None:
-        params = args.params.split(',')    
+        params = args.params.split(',')
         for param in params:
             p = param.split('=')
             if len(p) != 2:

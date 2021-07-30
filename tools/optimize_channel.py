@@ -17,6 +17,9 @@ parser.add_argument('--categories', required=False, type=str,
        default='res2b:r,res1b:r,boosted:r,classVBF:r_qqhh,classGGF:r,classttH:r_qqhh,classTT:r_qqhh,classDY:r_qqhh',
        help="comma separated list of categories and pois: cat1:poi1,cat2:poi2 ...")
 parser.add_argument('--verbose', required=False, type=int, default=2, help="verbosity level")
+parser.add_argument('binning_suggestions', type=str, nargs='*',
+                    help="suggestions for binnings to try (e.g. best binnings from the previous round)")
+
 args = parser.parse_args()
 
 def sh_call(cmd, error_message, verbose=0):
@@ -56,6 +59,26 @@ for d in [args.output, output_dir, workers_dir, best_dir]:
     if not os.path.isdir(d):
         os.mkdir(d)
 
+suggested_binnings = {}
+
+for bs_file in args.binning_suggestions:
+    with open(bs_file, 'r') as f:
+        bs = json.load(f)
+    if args.channel in bs:
+        for cat, cat_entry in bs[args.channel].items():
+            if cat not in suggested_binnings:
+                suggested_binnings[cat] = []
+            if type(cat_entry) == list:
+                if len(cat_entry) > 0:
+                    if type(cat_entry[0]) == list:
+                        for binning in cat_entry:
+                            suggested_binnings[cat].append(binning)
+                    else:
+                        suggested_binnings[cat].append(cat_entry)
+            elif type(cat_entry) == dict:
+                suggested_binnings[cat].append(cat_entry['bin_edges'])
+            else:
+                raise RuntimeError("Unknown format of suggested binning in '{}'.".format(bs_file))
 
 best_binnings_file = os.path.join(output_dir, 'best.json')
 if os.path.isfile(best_binnings_file):
@@ -75,6 +98,12 @@ for cat_index in range(first_cat_index, len(categories)):
     cat_dir = os.path.join(output_dir, category)
     if not os.path.isdir(cat_dir):
         os.mkdir(cat_dir)
+
+    cat_suggestions = os.path.join(cat_dir, 'to_try.json')
+    if category in suggested_binnings:
+        with open(cat_suggestions, 'w') as f:
+            json.dump(suggested_binnings[category], f)
+
     cat_log = os.path.join(cat_dir, 'results.json')
 
     opt_cmd = "python tools/optimize_binning.py --input {} --output {} --workers-dir {} --max-n-bins {} --poi {}" \
