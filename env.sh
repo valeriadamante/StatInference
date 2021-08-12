@@ -21,6 +21,7 @@ function run_cmd {
 }
 
 function run_source {
+    echo $1
     source setup.sh
     RESULT=$?
     if [ $RESULT -ne 0 ] ; then
@@ -30,6 +31,11 @@ function run_source {
 }
 
 export ENV_NAME=$1
+if [ $# -ge 3 ] ; then
+    ENV_VARIANT=$2
+else
+    ENV_VARIANT=base
+fi
 
 if [ $ENV_NAME = "bbtt" ] ; then
     cmssw_ver=CMSSW_10_2_13
@@ -41,7 +47,7 @@ if [ $ENV_NAME = "bbtt" ] ; then
         run_cmd eval `scramv1 runtime -sh`
         run_cmd git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
         run_cmd cd HiggsAnalysis/CombinedLimit
-        run_cmd git checkout v8.1.0
+        run_cmd git checkout v8.2.0
         run_cmd cd ../..
         run_cmd git clone https://github.com/cms-analysis/CombineHarvester.git CombineHarvester
         run_cmd scram b -j4
@@ -51,6 +57,7 @@ if [ $ENV_NAME = "bbtt" ] ; then
         run_cmd cd $cmssw_ver/src
         run_cmd eval `scramv1 runtime -sh`
     fi
+    run_cmd ulimit -s unlimited
     run_cmd cd ../..
     export PYTHONPATH=$PWD/$PYTHONPATH
 elif [ $ENV_NAME = "hh" ] ; then
@@ -58,12 +65,12 @@ elif [ $ENV_NAME = "hh" ] ; then
         echo "Installing an environment for the HH statistical inference..."
         run_cmd git clone --recursive ssh://git@gitlab.cern.ch:7999/hh/tools/inference.git
         run_cmd cd inference
-        run_source
+        run_source $ENV_VARIANT
         run_cmd touch .installed
     else
         echo "Loading an environment for the HH statistical inference..."
         run_cmd cd inference
-        run_source
+        run_source $ENV_VARIANT
     fi
     run_cmd cd ..
 elif [ $ENV_NAME = "lcg" ] ; then
