@@ -1,0 +1,44 @@
+analysis: hh_bbtt
+type: resonant
+eras:
+  - Run2_2018
+channels:
+  - eTau
+  - muTau
+  - tauTau
+categories:
+  - res1b
+  - res2b
+  - boosted
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+  - process: GluGluToRadionToHHTo2B2Tau_M_${MX}
+    hist_name: GluGluToRadionToHHTo2B2Tau_M-${MX}
+    param_values: [ 300, 400 ]
+    is_signal: true
+  - TT
+  - DY
+uncertainties:
+  - name: lumi_13TeV
+    type: lnN
+    value: 1.03
+    processes: .*
+  # - name: JER
+  #   type: shape
+
+  # - EWK
+  # - singleT
+  # - W
+  # - VV
+  # - VVV
+  # - TTX
+  # - QCD
+  # - DY_LM
+# singleH_bkg:
+#   - ZH
+#   - WH
+#   - ttH
+#   - ggH
+#   - VBFH
