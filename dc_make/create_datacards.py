@@ -9,7 +9,7 @@ if __name__ == "__main__":
     sys.path.append(base_dir)
   __package__ = file_dir_name
 
-from .tools.HarvesterInterface import HarvesterInterface
+from .maker import DatacardMaker
 
 if __name__ == "__main__":
   import argparse
@@ -17,9 +17,14 @@ if __name__ == "__main__":
   parser.add_argument('--input', required=True, type=str, help="input directory")
   parser.add_argument('--output', required=True, type=str, help="output directory")
   parser.add_argument('--config', required=True, type=str, help="configuration file")
+  parser.add_argument('--hist-bins', required=False, type=str, default=None, help="bin edges to rebin histograms")
   args = parser.parse_args()
 
-  hi = HarvesterInterface(args.config, args.input)
-  hi.createDatacards(args.output)
+  if args.hist_bins is not None:
+    hist_bins = [ float(x) for x in args.hist_bins.split(',') ]
+  else:
+    hist_bins = None
+  maker = DatacardMaker(args.config, args.input, hist_bins=hist_bins)
+  maker.createDatacards(args.output)
 
 

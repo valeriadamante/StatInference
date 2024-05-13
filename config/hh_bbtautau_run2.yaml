@@ -16,17 +16,26 @@ processes:
     is_asimov_data: true
   - process: GluGluToRadionToHHTo2B2Tau_M_${MX}
     hist_name: GluGluToRadionToHHTo2B2Tau_M-${MX}
-    param_values: [ 300, 400 ]
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900,
+                    1000, 1250, 1500, 1750, 2000, 2500, 3000,  ]
     is_signal: true
+    scale: 2 * 6.272E-02 * 5.824E-01
   - TT
   - DY
 uncertainties:
   - name: lumi_13TeV
     type: lnN
     value: 1.03
-    processes: .*
-  # - name: JER
-  #   type: shape
+    processes: ^.*$
+  - name: JER
+    type: shape
+    categories: ^res[12]b$
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+
 
   # - EWK
   # - singleT
