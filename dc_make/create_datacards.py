@@ -3,13 +3,14 @@ import sys
 
 if __name__ == "__main__":
   file_dir = os.path.dirname(os.path.abspath(__file__))
-  base_dir = os.path.dirname(file_dir)
-  file_dir_name = os.path.split(file_dir)[1]
+  pkg_dir = os.path.dirname(file_dir)
+  base_dir = os.path.dirname(pkg_dir)
+  pkg_dir_name = os.path.split(pkg_dir)[1]
   if base_dir not in sys.path:
     sys.path.append(base_dir)
-  __package__ = file_dir_name
+  __package__ = pkg_dir_name
 
-from .maker import DatacardMaker
+from StatInference.dc_make.maker import DatacardMaker
 
 if __name__ == "__main__":
   import argparse

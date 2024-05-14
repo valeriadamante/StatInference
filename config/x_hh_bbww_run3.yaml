@@ -1,0 +1,45 @@
+analysis: hh_bbww
+type: resonant
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  input_file_pattern: ${ERA}/shape_m${MX}.root
+hist_bins: [ 0, 0.7, 1 ]
+eras:
+  - Run3_2022EE
+channels:
+  - ee
+  - emu
+  - mumu
+categories:
+  - res1b
+  - res2b
+  - boost
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+  - process: ggRadion_HH_bbWW_M_${MX}
+    hist_name: ggRadion_HH_bbWW_M${MX}
+    param_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
+    is_signal: true
+    scale: 2 * 5.824e-01 * ( 2.137e-01 * 3 * 10.86e-02 * 3 * 10.86e-02)
+  - TT
+  - DY
+  - ST
+  # - Other
+uncertainties:
+  - name: lumi_13TeV
+    type: lnN
+    value: 1.014 # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun3
+  - name: eleID
+    type: shape
+  - name: muID
+    type: shape
+  - name: pu
+    type: shape
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1

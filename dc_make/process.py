@@ -1,5 +1,7 @@
+from ..common.param_parse import extractParameters, applyParameters, parameterListToDict
+
 class Process:
-  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1):
+  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None):
     self.name = name
     self.hist_name = hist_name
     self.is_signal = is_signal
@@ -7,6 +9,7 @@ class Process:
     self.is_asimov_data = is_asimov_data
     self.is_background = not (is_signal or is_data)
     self.scale=scale
+    self.params = params
 
     if is_data and is_signal:
       raise RuntimeError("Data and signal flags cannot be set simultaneously")
@@ -21,35 +24,22 @@ class Process:
       self.type = "background"
 
   def __str__(self):
-    return f"Process({self.name}, type={self.type})"
+    str_rep =  f"Process({self.name}, type={self.type}"
+    if self.is_signal:
+      str_rep += f", params={self.params}"
+    str_rep += ")"
+    return str_rep
+
+  def hasCompatibleModelParams(self, model_params):
+    if not model_params or not self.is_signal:
+      return True
+    for param, value in self.params.items():
+      if model_params[param] != value:
+        return False
+    return True
 
   @staticmethod
-  def extractParameters(name_pattern):
-    parameters = []
-    idx = 0
-    while True:
-      pos = name_pattern.find("${", idx)
-      if pos == -1:
-        break
-      end = name_pattern.find("}", pos)
-      param_name = name_pattern[pos+2:end]
-      parameters.append(param_name)
-      idx = end
-    return parameters
-
-  @staticmethod
-  def applyParameters(name_pattern, parameters, param_values):
-    if len(parameters) == 1 and type(param_values) != list:
-      param_values = [ param_values ]
-    if len(param_values) != len(parameters):
-      raise RuntimeError("Invalid parameter entry length")
-    for n in range(len(parameters)):
-      param_name = parameters[n]
-      name_pattern = name_pattern.replace("${" + param_name + "}", str(param_values[n]))
-    return name_pattern
-
-  @staticmethod
-  def fromConfig(entry):
+  def fromConfig(entry, model):
     if type(entry) == str:
       return [ Process(entry, entry) ]
     if type(entry) != dict:
@@ -63,16 +53,20 @@ class Process:
     if type(scale) == str:
       scale = eval(scale)
     if 'param_values' not in entry:
+      if is_signal and len(model.parameters) > 0:
+        raise RuntimeError("Signal process must have parameter values")
       return [ Process(base_name, base_hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
                        scale=scale) ]
-    parameters = Process.extractParameters(base_name)
+
+    parameters = model.parameters if is_signal else extractParameters(base_name)
     param_values = entry["param_values"]
     if type(param_values) != list or len(param_values) == 0:
       raise RuntimeError("Invalid parameter values")
     processes = []
     for param_entry in param_values:
-      name = Process.applyParameters(base_name, parameters, param_entry)
-      hist_name = Process.applyParameters(base_hist_name, parameters, param_entry)
+      param_dict = parameterListToDict(parameters, param_entry)
+      name = applyParameters(base_name, param_dict)
+      hist_name = applyParameters(base_hist_name, param_dict)
       processes.append(Process(name, hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
-                               scale=scale))
+                               scale=scale, params=param_dict))
     return processes

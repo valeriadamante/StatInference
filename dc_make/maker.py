@@ -8,6 +8,7 @@ from CombineHarvester.CombineTools.ch import CombineHarvester
 from StatInference.common.tools import hasNegativeBins, listToVector, rebinAndFill, importROOT
 from .process import Process
 from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
+from .model import Model
 ROOT = importROOT()
 
 class DatacardMaker:
@@ -28,11 +29,14 @@ class DatacardMaker:
       bin = self.getBin(era, channel, cat, return_index=False)
       self.bins.append(bin)
 
+    self.model = Model.fromConfig(cfg["model"])
+
+    self.param_bins = {}
     self.processes = {}
     data_process = None
     has_signal = False
     for process in cfg["processes"]:
-      new_processes = Process.fromConfig(process)
+      new_processes = Process.fromConfig(process, self.model)
       for process in new_processes:
         if process.name in self.processes:
           raise RuntimeError(f"Process name {process.name} already exists")
@@ -44,6 +48,10 @@ class DatacardMaker:
           data_process = process
         if process.is_signal:
           has_signal = True
+          param_bin = self.model.paramStr(process.params)
+          if param_bin in self.param_bins:
+            raise RuntimeError(f"Signal process with parameters {param_bin} already exists")
+          self.param_bins[param_bin] = process.params
     if data_process is None:
       raise RuntimeError("No data process defined")
     if not has_signal:
@@ -62,7 +70,7 @@ class DatacardMaker:
     if self.hist_bins is None:
       self.hist_bins = cfg.get("hist_bins", None)
     if self.hist_bins is not None:
-      self.hist_bins = listToVector(self.hist_bins, 'float')
+      self.hist_bins = listToVector(self.hist_bins, 'double')
 
     self.input_files = {}
     self.shapes = {}
@@ -78,37 +86,37 @@ class DatacardMaker:
       return index
     return (index, name)
 
-  def cbCopy(self, process, era, channel, category):
+  def cbCopy(self, param_str, process, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
-    return self.cb.cp().process([process]).bin([bin_name])
+    return self.cb.cp().mass([param_str]).process([process]).bin([bin_name])
 
   def ECC(self):
     return itertools.product(self.eras, self.channels, self.categories)
 
-  def PECC(self):
-    return itertools.product(self.processes.keys(), self.eras, self.channels, self.categories)
+  def PPECC(self):
+    param_bins = self.param_bins.keys() if self.model.param_dependent_bkg else [ "*" ]
+    return itertools.product(self.processes.keys(), param_bins, self.eras, self.channels, self.categories)
 
-  def getInputFileName(self, era):
-    file_name = f'{era}.root'
-    return os.path.join(self.input_path, file_name)
-
-  def getInputFile(self, era):
-    if era not in self.input_files:
-      file_name = self.getInputFileName(era)
-      file = ROOT.TFile.Open(file_name, "READ")
+  def getInputFile(self, era, model_params):
+    file_name = self.model.getInputFileName(era, model_params)
+    if file_name not in self.input_files:
+      full_file_name = os.path.join(self.input_path, file_name)
+      file = ROOT.TFile.Open(full_file_name, "READ")
       if file == None:
-        raise RuntimeError(f"Cannot open file {file_name}")
-      self.input_files[era] = file
-    return self.input_files[era]
+        raise RuntimeError(f"Cannot open file {full_file_name}")
+      self.input_files[file_name] = file
+    return self.input_files[file_name]
 
-  def getShape(self, process, era, channel, category, syst_name=None, syst_scale=None):
-    key = (process.name, era, channel, category, syst_name, syst_scale)
+  def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
+    key = (process.name, era, channel, category, unc_name, unc_scale)
     if key not in self.shapes:
+      if process.is_data and (unc_name is not None or unc_scale is not None):
+        raise RuntimeError("Cannot apply uncertainty to the data process")
       if process.is_asimov_data:
         hist = None
         for bkg_proc in self.processes.values():
           if bkg_proc.is_background:
-            bkg_hist = self.getShape(bkg_proc, era, channel, category)
+            bkg_hist = self.getShape(bkg_proc, era, channel, category, model_params)
             if hist is None:
               hist = bkg_hist.Clone()
             else:
@@ -116,10 +124,10 @@ class DatacardMaker:
         if hist is None:
           raise RuntimeError("Cannot create asimov data histogram")
       else:
-        file = self.getInputFile(era)
+        file = self.getInputFile(era, model_params)
         hist_name = f"{channel}/{category}/{process.hist_name}"
-        if syst_name is not None:
-          hist_name = f"{hist_name}_{syst_name}{syst_scale}"
+        if unc_name is not None:
+          hist_name = f"{hist_name}_{unc_name}{unc_scale}"
         hist = file.Get(hist_name)
         if hist == None:
           raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
@@ -131,45 +139,83 @@ class DatacardMaker:
       if process.scale != 1:
         hist.Scale(process.scale)
       if hasNegativeBins(hist):
+        axis = hist.GetXaxis()
+        bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
+        bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
+        print(f'bins_edges: [ {", ".join(bins_edges)} ]')
+        print(f'bin_values: [ {", ".join(bin_values)} ]')
         raise RuntimeError(f"Negative bins found in histogram {hist_name}")
       self.shapes[key] = hist
     return self.shapes[key]
 
+
   def addProcess(self, proc, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
     process = self.processes[proc]
-    if process.is_data:
-      self.cb.AddObservations(["*"], [self.analysis], [era], [channel], [(bin_idx, bin_name)])
-    else:
-      self.cb.AddProcesses(["*"], [self.analysis], [era], [channel], [proc], [(bin_idx, bin_name)], process.is_signal)
 
-    shape = self.getShape(process, era, channel, category)
-    def setShape(p):
-      print(f"Setting shape for {p}")
-      p.set_shape(shape, True)
-    cb_copy = self.cbCopy(proc, era, channel, category)
-    if process.is_data:
-      cb_copy.ForEachObs(setShape)
+    def add(model_params, param_str):
+      if process.is_data:
+        self.cb.AddObservations([param_str], [self.analysis], [era], [channel], [(bin_idx, bin_name)])
+      else:
+        self.cb.AddProcesses([param_str], [self.analysis], [era], [channel], [proc], [(bin_idx, bin_name)], process.is_signal)
+      shape = self.getShape(process, era, channel, category, model_params)
+      shape_set = False
+      def setShape(p):
+        nonlocal shape_set
+        print(f"Setting shape for {p}")
+        if shape_set:
+          raise RuntimeError("Shape already set")
+        p.set_shape(shape, True)
+        shape_set = True
+      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
+      if process.is_data:
+        cb_copy.ForEachObs(setShape)
+      else:
+        cb_copy.ForEachProc(setShape)
+
+
+    if process.is_signal:
+      model_params = process.params
+      param_str = self.model.paramStr(model_params)
+      add(model_params, param_str)
+    elif self.model.param_dependent_bkg:
+      for signal_proc in self.processes.values():
+        if signal_proc.is_signal:
+          model_params = signal_proc.params
+          param_str = self.model.paramStr(model_params)
+          add(model_params, param_str)
     else:
-      cb_copy.ForEachProc(setShape)
+      add(None, "*")
 
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
-    for proc, era, channel, category in self.PECC():
-      if unc.appliesTo(proc, era, channel, category):
-        systMap = unc.valueToMap()
-        cb_copy = self.cbCopy(proc, era, channel, category)
-        cb_copy.AddSyst(self.cb, unc_name, unc.type.name, systMap)
-        if unc.type == UncertaintyType.shape:
-          shapes = {}
-          nominal_shape = self.getShape(self.processes[proc], era, channel, category)
-          for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
-            shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, unc_name, unc_scale.name)
-          def setShape(syst):
-            print(f"Setting unc shape for {syst}")
-            syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
-          cb_copy = self.cbCopy(proc, era, channel, category).syst_name([unc_name])
-          cb_copy.ForEachSyst(setShape)
+    for proc, param_str, era, channel, category in self.PPECC():
+      process = self.processes[proc]
+      if process.is_data: continue
+      if not unc.appliesTo(proc, era, channel, category): continue
+      model_params = self.param_bins.get(param_str, None)
+      if not process.hasCompatibleModelParams(model_params): continue
+
+      systMap = unc.valueToMap()
+      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
+      cb_copy.AddSyst(self.cb, unc_name, unc.type.name, systMap)
+      if unc.type == UncertaintyType.shape:
+        shapes = {}
+        model_params = self.param_bins.get(param_str, None)
+        nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
+        for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
+          shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
+                                            unc_name, unc_scale.name)
+        shape_set = False
+        def setShape(syst):
+          nonlocal shape_set
+          print(f"Setting unc shape for {syst}")
+          if shape_set:
+            raise RuntimeError("Shape already set")
+          syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
+          shape_set = True
+        cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
+        cb_copy.ForEachSyst(setShape)
 
   def writeDatacards(self, output):
     os.makedirs(output, exist_ok=True)
@@ -177,8 +223,10 @@ class DatacardMaker:
     for proc_name, process in self.processes.items():
       if not process.is_signal: continue
       processes = [proc_name] + background_names
-      self.cb.cp().process(processes).WriteDatacard(os.path.join(output, f"datacard_{proc_name}.txt"),
-                                                    os.path.join(output, f"{proc_name}.root"))
+      param_str = self.model.paramStr(process.params)
+      dc_file = os.path.join(output, f"datacard_{proc_name}.txt")
+      shape_file = os.path.join(output, f"{proc_name}.root")
+      self.cb.cp().mass([param_str]).process(processes).WriteDatacard(dc_file, shape_file)
 
   def createDatacards(self, output, verbose=1):
     try:

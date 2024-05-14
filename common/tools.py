@@ -52,8 +52,11 @@ def rebinAndFill(new_hist, old_hist, epsilon=1e-7):
     if not (bin_low_new == bin_up_new or \
             abs(old_up_edge - new_up_edge) <= epsilon * abs(old_up_edge + new_up_edge) * 2):
       old_bins = [ str(old_axis.GetBinLowEdge(n)) for n in range(1, old_axis.GetNbins() + 2)]
+      new_bins = [ str(new_axis.GetBinLowEdge(n)) for n in range(1, new_axis.GetNbins() + 2)]
       print('old_bins: [{}]'.format(', '.join(old_bins)))
-      raise RuntimeError("Uncompatible bin edges")
+      print('new_bins: [{}]'.format(', '.join(new_bins)))
+
+      raise RuntimeError("Incompatible bin edges")
     return bin_low_new
 
   def add_bin_content(bin_old, bin_new):
