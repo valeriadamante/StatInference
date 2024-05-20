@@ -31,13 +31,16 @@ processes:
 uncertainties:
   - name: lumi_13TeV
     type: lnN
-    value: 1.014 # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun3
+    value: 0.014 # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun3
   - name: eleID
-    type: shape
+    type: auto
   - name: muID
-    type: shape
+    type: auto
   - name: pu
-    type: shape
+    type: auto
+autolnNThr: 0.05
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
 autoMCStats:
   apply: true
   threshold: 20

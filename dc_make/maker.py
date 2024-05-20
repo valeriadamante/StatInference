@@ -64,6 +64,10 @@ class DatacardMaker:
         raise RuntimeError(f"Uncertainty {unc.name} already exists")
       self.uncertainties[unc.name] = unc
 
+    self.autolnNThr = cfg.get("autolnNThr", 0.05)
+    self.asymlnNThr = cfg.get("asymlnNThr", 0.001)
+    self.ignorelnNThr = cfg.get("ignorelnNThr", 0.001)
+
     self.autoMCStats = cfg.get("autoMCStats", { 'apply': False })
 
     self.hist_bins = hist_bins
@@ -173,7 +177,6 @@ class DatacardMaker:
       else:
         cb_copy.ForEachProc(setShape)
 
-
     if process.is_signal:
       model_params = process.params
       param_str = self.model.paramStr(model_params)
@@ -196,16 +199,22 @@ class DatacardMaker:
       model_params = self.param_bins.get(param_str, None)
       if not process.hasCompatibleModelParams(model_params): continue
 
-      systMap = unc.valueToMap()
-      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
-      cb_copy.AddSyst(self.cb, unc_name, unc.type.name, systMap)
-      if unc.type == UncertaintyType.shape:
-        shapes = {}
+      nominal_shape = None
+      shapes = {}
+      if unc.type in [ UncertaintyType.shape, UncertaintyType.auto ]:
         model_params = self.param_bins.get(param_str, None)
         nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
         for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
           shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
                                             unc_name, unc_scale.name)
+      unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
+      if unc.canIgnore(self.ignorelnNThr):
+        print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
+        continue
+      systMap = unc_to_apply.valueToMap()
+      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
+      cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
+      if unc_to_apply.type == UncertaintyType.shape:
         shape_set = False
         def setShape(syst):
           nonlocal shape_set
