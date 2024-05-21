@@ -18,90 +18,21 @@ class UncertaintyType(Enum):
   shape = 2
 
 class Uncertainty:
+  def __init__(self, name, processes=None, eras=None, channels=None, categories=None):
+    self.name = name
+    self.processes = processes
+    self.eras = eras
+    self.channels = channels
+    self.categories = categories
+
   def appliesTo(self, process, era, channel, category):
     return  Uncertainty.hasMatch(process, self.processes) \
         and Uncertainty.hasMatch(era, self.eras) \
         and Uncertainty.hasMatch(channel, self.channels) \
         and Uncertainty.hasMatch(category, self.categories)
 
-  def canIgnore(self, value_thr):
-    if self.type == UncertaintyType.lnN:
-      if type(self.value) == float:
-        return abs(self.value) < value_thr
-      return abs(self.value[UncertaintyScale.Up]) < value_thr and abs(self.value[UncertaintyScale.Down]) < value_thr
-
-  def valueToMap(self):
-    if self.type == UncertaintyType.lnN:
-      if type(self.value) == float:
-        return SystMap()(1 + self.value)
-      v_down = 1 + self.value[UncertaintyScale.Down]
-      v_up = 1 + self.value[UncertaintyScale.Up]
-      print(f'{self.name}: {v_down} {v_up}')
-      return SystMap()((v_down, v_up))
-    elif self.type == UncertaintyType.shape:
-      return SystMap()(1.0)
-    else:
-      raise RuntimeError(f"value is not defined for {self.name}")
-
   def resolveType(self, nominal_shape, shape_variations, auto_lnN_threshold, asym_value_threshold):
-    if self.type != UncertaintyType.auto:
-      return self
-
-    nominal_shape = nominal_shape.Clone()
-    for n in range(0, nominal_shape.GetNbinsX() + 2):
-      nominal_shape.SetBinError(n, 0)
-    all_compatible = True
-    for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
-      if not Uncertainty.haveCompatibleShapes(nominal_shape, shape_variations[unc_scale], auto_lnN_threshold):
-        all_compatible = False
-        break
-    unc_copy = copy.deepcopy(self)
-    if not all_compatible:
-      unc_copy.type = UncertaintyType.shape
-    else:
-      unc_copy.type = UncertaintyType.lnN
-      unc_copy.value = {}
-      nominal_integral = nominal_shape.Integral()
-      for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
-        scaled_integral = shape_variations[unc_scale].Integral()
-        unc_copy.value[unc_scale] = (scaled_integral - nominal_integral) / nominal_integral
-      pass_zero_check, pass_sign_check, pass_magnitude_check = unc_copy._checkValue(raise_error=False)
-      if pass_sign_check and pass_magnitude_check:
-        delta = abs(unc_copy.value[UncertaintyScale.Up]) - abs(unc_copy.value[UncertaintyScale.Down])
-        if abs(delta) <= asym_value_threshold:
-          max_value = max(abs(unc_copy.value[UncertaintyScale.Up]), abs(unc_copy.value[UncertaintyScale.Down]))
-          unc_copy.value = math.copysign(max_value, unc_copy.value[UncertaintyScale.Up])
-      else:
-        del unc_copy.value
-        unc_copy.type = UncertaintyType.shape
-    return unc_copy
-
-  def _checkValue(self, raise_error=True):
-    pass_zero_check = True
-    pass_sign_check = True
-    pass_magnitude_check = True
-    if self.type == UncertaintyType.lnN:
-      if type(self.value) == float:
-        if self.value == 0:
-          pass_zero_check = False
-        if abs(self.value) >= 1:
-          pass_magnitude_check = False
-      elif type(self.value) == dict:
-        if self.value[UncertaintyScale.Down] == 0 or self.value[UncertaintyScale.Up] == 0:
-          pass_zero_check = False
-        if self.value[UncertaintyScale.Down] * self.value[UncertaintyScale.Up] > 0:
-          pass_sign_check = False
-        if abs(self.value[UncertaintyScale.Down]) >= 1 or abs(self.value[UncertaintyScale.Up]) >= 1:
-          pass_magnitude_check = False
-      else:
-        raise RuntimeError("Invalid lnN uncertainty value")
-    if not pass_zero_check and raise_error:
-      raise RuntimeError(f"Value of lnN uncertainty {self.name} cannot be zero")
-    if not pass_sign_check and raise_error:
-      raise RuntimeError(f"Up/down values of lnN uncertainty {self.name} must have opposite signs")
-    if not pass_magnitude_check and raise_error:
-      raise RuntimeError(f"Value of lnN uncertainty {self.name} must be less than 100%")
-    return pass_zero_check, pass_sign_check, pass_magnitude_check
+    return self
 
   @staticmethod
   def fitFlat(histogram):
@@ -138,18 +69,8 @@ class Uncertainty:
 
   @staticmethod
   def fromConfig(entry):
-    unc = Uncertainty()
-    unc.name = entry["name"]
-    unc.type = UncertaintyType[entry["type"]]
-    if unc.type == UncertaintyType.lnN:
-      value = entry["value"]
-      if type(value) in [ float, int ]:
-        unc.value = float(value)
-      elif type(value) == list and len(value) == 2:
-        unc.value = { UncertaintyScale.Down: value[0], UncertaintyScale.Up: value[1] }
-      else:
-        raise RuntimeError("Invalid lnN uncertainty value")
-      unc._checkValue()
+    name = entry["name"]
+    unc_type = UncertaintyType[entry["type"]]
 
     def getPatternList(key):
       if key not in entry:
@@ -159,9 +80,133 @@ class Uncertainty:
         return [ v ]
       return v
 
-    unc.processes = getPatternList("processes")
-    unc.eras = getPatternList("eras")
-    unc.channels = getPatternList("channels")
-    unc.categories = getPatternList("categories")
+    args = {}
+    for key in [ "processes", "eras", "channels", "categories" ]:
+      args[key] = getPatternList(key)
+
+    if unc_type == UncertaintyType.lnN:
+      value = entry["value"]
+      if type(value) in [ float, int ]:
+        value = float(value)
+      elif type(value) == list and len(value) == 2:
+        value = { UncertaintyScale.Down: value[0], UncertaintyScale.Up: value[1] }
+      else:
+        raise RuntimeError("Invalid lnN uncertainty value")
+
+    if unc_type == UncertaintyType.lnN:
+      unc = LnNUncertainty(name, value, **args)
+      unc.checkValue()
+    elif unc_type == UncertaintyType.shape:
+      unc = ShapeUncertainty(name, **args)
+    elif unc_type == UncertaintyType.auto:
+      unc = AutoUncertainty(name, **args)
+    else:
+      raise RuntimeError("Invalid uncertainty type")
 
     return unc
+
+class LnNUncertainty(Uncertainty):
+  def __init__(self, name, value, **kwargs):
+    super().__init__(name, **kwargs)
+    self.value = value
+
+  @property
+  def type(self):
+    return UncertaintyType.lnN
+
+  @property
+  def needShapes(self):
+    return False
+
+  def canIgnore(self, value_thr):
+    if type(self.value) == float:
+      return abs(self.value) < value_thr
+    return abs(self.value[UncertaintyScale.Up]) < value_thr and abs(self.value[UncertaintyScale.Down]) < value_thr
+
+  def checkValue(self, raise_error=True):
+    pass_zero_check = True
+    pass_sign_check = True
+    pass_magnitude_check = True
+    if type(self.value) == float:
+      if self.value == 0:
+        pass_zero_check = False
+      if abs(self.value) >= 1:
+        pass_magnitude_check = False
+    elif type(self.value) == dict:
+      if self.value[UncertaintyScale.Down] == 0 or self.value[UncertaintyScale.Up] == 0:
+        pass_zero_check = False
+      if self.value[UncertaintyScale.Down] * self.value[UncertaintyScale.Up] > 0:
+        pass_sign_check = False
+      if abs(self.value[UncertaintyScale.Down]) >= 1 or abs(self.value[UncertaintyScale.Up]) >= 1:
+        pass_magnitude_check = False
+    else:
+      raise RuntimeError("Invalid lnN uncertainty value")
+
+    if not pass_zero_check and raise_error:
+      raise RuntimeError(f"Value of lnN uncertainty {self.name} cannot be zero")
+    if not pass_sign_check and raise_error:
+      raise RuntimeError(f"Up/down values of lnN uncertainty {self.name} must have opposite signs")
+    if not pass_magnitude_check and raise_error:
+      raise RuntimeError(f"Value of lnN uncertainty {self.name} must be less than 100%")
+    return pass_zero_check, pass_sign_check, pass_magnitude_check
+
+  def valueToMap(self, digits=3):
+    if type(self.value) == float:
+      value = round(1 + self.value, digits)
+    else:
+      v_down = round(1 + self.value[UncertaintyScale.Down], digits)
+      v_up = round(1 + self.value[UncertaintyScale.Up], digits)
+      value = (v_down, v_up)
+    return SystMap()(value)
+
+class ShapeUncertainty(Uncertainty):
+  @property
+  def type(self):
+    return UncertaintyType.shape
+
+  @property
+  def needShapes(self):
+    return True
+
+  def canIgnore(self, value_thr):
+    return False
+
+  def valueToMap(self, digits=3):
+    return SystMap()(1.0)
+
+class AutoUncertainty(Uncertainty):
+  @property
+  def needShapes(self):
+    return True
+
+  def canIgnore(self, value_thr):
+    raise RuntimeError("Uncertainty type is not resolved yet")
+
+  def valueToMap(self, digits=3):
+    raise RuntimeError("Uncertainty type is not resolved yet")
+
+  def resolveType(self, nominal_shape, shape_variations, auto_lnN_threshold, asym_value_threshold):
+    nominal_shape = nominal_shape.Clone()
+    for n in range(0, nominal_shape.GetNbinsX() + 2):
+      nominal_shape.SetBinError(n, 0)
+    all_compatible = True
+    for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
+      if not Uncertainty.haveCompatibleShapes(nominal_shape, shape_variations[unc_scale], auto_lnN_threshold):
+        all_compatible = False
+        break
+    args = { "processes": self.processes, "eras": self.eras, "channels": self.channels, "categories": self.categories }
+    if all_compatible:
+      unc_value = {}
+      nominal_integral = nominal_shape.Integral()
+      for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
+        scaled_integral = shape_variations[unc_scale].Integral()
+        unc_value[unc_scale] = (scaled_integral - nominal_integral) / nominal_integral
+      unc = LnNUncertainty(self.name, unc_value, **args)
+      pass_zero_check, pass_sign_check, pass_magnitude_check = unc.checkValue(raise_error=False)
+      if pass_sign_check and pass_magnitude_check:
+        delta = abs(unc.value[UncertaintyScale.Up]) - abs(unc.value[UncertaintyScale.Down])
+        if abs(delta) <= asym_value_threshold:
+          max_value = max(abs(unc.value[UncertaintyScale.Up]), abs(unc.value[UncertaintyScale.Down]))
+          unc.value = math.copysign(max_value, unc.value[UncertaintyScale.Up])
+        return unc
+    return ShapeUncertainty(self.name, **args)

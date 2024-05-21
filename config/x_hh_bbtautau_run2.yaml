@@ -1,5 +1,9 @@
 analysis: hh_bbtt
 type: resonant
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: false
+  input_file_pattern: ${ERA}.root
 eras:
   - Run2_2018
 channels:
@@ -25,29 +29,16 @@ processes:
 uncertainties:
   - name: lumi_13TeV
     type: lnN
-    value: 1.03
+    value: 0.03
     processes: ^.*$
   - name: JER
-    type: shape
+    type: auto
     categories: ^res[12]b$
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
 autoMCStats:
   apply: true
   threshold: 20
   apply_to_signal: true
   mode: 1
-
-
-  # - EWK
-  # - singleT
-  # - W
-  # - VV
-  # - VVV
-  # - TTX
-  # - QCD
-  # - DY_LM
-# singleH_bkg:
-#   - ZH
-#   - WH
-#   - ttH
-#   - ggH
-#   - VBFH

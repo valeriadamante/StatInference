@@ -98,7 +98,9 @@ class DatacardMaker:
     return itertools.product(self.eras, self.channels, self.categories)
 
   def PPECC(self):
-    param_bins = self.param_bins.keys() if self.model.param_dependent_bkg else [ "*" ]
+    param_bins = list(self.param_bins.keys())
+    if not self.model.param_dependent_bkg:
+      param_bins.append("*")
     return itertools.product(self.processes.keys(), param_bins, self.eras, self.channels, self.categories)
 
   def getInputFile(self, era, model_params):
@@ -197,18 +199,18 @@ class DatacardMaker:
       if process.is_data: continue
       if not unc.appliesTo(proc, era, channel, category): continue
       model_params = self.param_bins.get(param_str, None)
-      if not process.hasCompatibleModelParams(model_params): continue
+      if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
       nominal_shape = None
       shapes = {}
-      if unc.type in [ UncertaintyType.shape, UncertaintyType.auto ]:
+      if unc.needShapes:
         model_params = self.param_bins.get(param_str, None)
         nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
         for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
           shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
                                             unc_name, unc_scale.name)
       unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
-      if unc.canIgnore(self.ignorelnNThr):
+      if unc_to_apply.canIgnore(self.ignorelnNThr):
         print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
         continue
       systMap = unc_to_apply.valueToMap()
@@ -232,10 +234,12 @@ class DatacardMaker:
     for proc_name, process in self.processes.items():
       if not process.is_signal: continue
       processes = [proc_name] + background_names
-      param_str = self.model.paramStr(process.params)
+      param_list = [ self.model.paramStr(process.params) ]
+      if not self.model.param_dependent_bkg:
+        param_list.append('*')
       dc_file = os.path.join(output, f"datacard_{proc_name}.txt")
       shape_file = os.path.join(output, f"{proc_name}.root")
-      self.cb.cp().mass([param_str]).process(processes).WriteDatacard(dc_file, shape_file)
+      self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
 
   def createDatacards(self, output, verbose=1):
     try:

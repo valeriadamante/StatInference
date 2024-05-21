@@ -30,9 +30,13 @@ class Process:
     str_rep += ")"
     return str_rep
 
-  def hasCompatibleModelParams(self, model_params):
-    if not model_params or not self.is_signal:
+  def hasCompatibleModelParams(self, model_params, param_dependent_bkg):
+    if self.is_data or self.is_background:
+      if model_params and not param_dependent_bkg:
+        return False
       return True
+    if not model_params:
+      return False
     for param, value in self.params.items():
       if model_params[param] != value:
         return False
