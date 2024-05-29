@@ -6,9 +6,12 @@ model:
   input_file_pattern: ${ERA}.root
 eras:
   - Run2_2018
+  - Run2_2017
+  - Run2_2016
+  - Run2_2016_HIPM
 channels:
-  - eTau
-  - muTau
+  #- eTau
+  #- muTau
   - tauTau
 categories:
   - res1b
@@ -34,6 +37,670 @@ uncertainties:
   - name: JER
     type: auto
     categories: ^res[12]b$
+  - name: EleID
+    type: auto
+    categories: ^.*
+  - name: HighPtMuon_HighPtID
+    type: auto
+    categories: ^.*
+  - name: HighPtMuon_HighPtIDIso
+    type: auto
+    categories: ^.*
+  - name: HighPtMuon_Reco
+    type: auto
+    categories: ^.*
+  - name: HighPtMuon_TightID
+    type: auto
+    categories: ^.*
+  - name: Muon_HighPtID
+    type: auto
+    categories: ^.*
+  - name: MuonID_HighPtIso
+    type: auto
+    categories: ^.*
+  - name: MuonID_Reco
+    type: auto
+    categories: ^.*
+  - name: MuonID_TightID
+    type: auto
+    categories: ^.*
+  - name: MuonID_TightIDIso
+    type: auto
+    categories: ^.*
+  - name: TauID_total
+    type: auto
+    categories: ^.*
+  - name: TauID_stat1_DM0
+    type: auto
+    categories: ^.*
+  - name: TauID_stat1_DM10
+    type: auto
+    categories: ^.*
+  - name: TauID_stat1_DM11
+    type: auto
+    categories: ^.*
+  - name: TauID_stat1_DM1
+    type: auto
+    categories: ^.*
+  - name: TauID_stat2_DM0
+    type: auto
+    categories: ^.*
+  - name: TauID_stat2_DM10
+    type: auto
+    categories: ^.*
+  - name: TauID_stat2_DM11
+    type: auto
+    categories: ^.*
+  - name: TauID_stat2_DM1
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_alleras
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_year
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_year_DM0
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_year_DM10
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_year_DM11
+    type: auto
+    categories: ^.*
+  - name: TauID_syst_year_DM1
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineElectron_barrel
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineElectron_endcaps
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineMuon_eta0p4to0p8
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineMuon_eta0p8to1p2
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineMuon_eta1p2to1p7
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineMuon_etaGt1p7
+    type: auto
+    categories: ^.*
+  - name: TauID_genuineMuon_etaLt0p4
+    type: auto
+    categories: ^.*
+  - name: TauID_SF_stat_highpT_bin1
+    type: auto
+    categories: ^.*
+  - name: TauID_SF_stat_highpT_bin2
+    type: auto
+    categories: ^.*
+  - name: TauID_SF_syst_highpT_bin1
+    type: auto
+    categories: ^.*
+  - name: TauID_SF_syst_highpT_bin2
+    type: auto
+    categories: ^.*
+  - name: TauID_SF_syst_highpT_extrap
+    type: auto
+    categories: ^.*
+  - name: TrigSF_diTau_DM0
+    type: auto
+    categories: ^.*
+  - name: TrigSF_diTau_DM1
+    type: auto
+    categories: ^.*
+  - name: TrigSF_diTau_3Prong
+    type: auto
+    categories: ^.*
+  - name: TrigSF_singleEle
+    type: auto
+    categories: ^.*
+  - name: TrigSF_singleMu
+    type: auto
+    categories: ^.*
+  - name: TrigSF_eTau_Ele
+    type: auto
+    categories: ^.*
+  - name: TrigSF_eTau_DM0
+    type: auto
+    categories: ^.*
+  - name: TrigSF_eTau_DM1
+    type: auto
+    categories: ^.*
+  - name: TrigSF_eTau_3Prong
+    type: auto
+    categories: ^.*
+  - name: TrigSF_muTau_Mu
+    type: auto
+    categories: ^.*
+  - name: TrigSF_muTau_DM0
+    type: auto
+    categories: ^.*
+  - name: TrigSF_muTau_DM1
+    type: auto
+    categories: ^.*
+  - name: TrigSF_muTau_3Prong
+    type: auto
+    categories: ^.*
+  - name: #TrgSF_etau_3Prong
+    type: auto
+    categories: ^.*
+  - name: TrgSF_etau_DM0
+    type: auto
+    categories: ^.*
+  - name: TrgSF_etau_DM1
+    type: auto
+    categories: ^.*
+  - name: TrgSF_etau_ele
+    type: auto
+    categories: ^.*
+  - name: TrgSF_mutau_3Prong
+    type: auto
+    categories: ^.*
+  - name: TrgSF_mutau_DM0
+    type: auto
+    categories: ^.*
+  - name: TrgSF_mutau_DM1
+    type: auto
+    categories: ^.*
+  - name: TrgSF_mutau_mu
+    type: auto
+    categories: ^.*
+  - name: TrgSF_singleEle
+    type: auto
+    categories: ^.*
+  - name: TrgSF_singleMu24
+    type: auto
+    categories: ^.*
+  - name: TrgSF_singleTau
+    type: auto
+    categories: ^.*
+  - name: bTagShapeSF_lf
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_hf
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_lfstats1
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_lfstats2
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_hfstats1
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_hfstats2
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_cferr1
+    type: auto
+    categories: ^res[12]b$
+  - name: bTagShapeSF_cferr2
+    type: auto
+    categories: ^res[12]b$
+  - name: PUJetID
+    type: auto
+    categories: ^.*
+  - name: PileUp_Lumi_MC
+    type: auto
+    categories: ^.*
+  - name: #TrigSF_singleTau
+    type: auto
+    categories: ^.*
+  - name: L1Prefiring
+    type: auto
+    categories: ^.*
+  - name: L1Prefiring_ECAL
+    type: auto
+    categories: ^.*
+  - name: L1Prefiring_Muon_Stat
+    type: auto
+    categories: ^.*
+  - name: L1Prefiring_Muon_Syst
+    type: auto
+    categories: ^.*
+  - name: TauES_DM0
+    type: auto
+    categories: ^.*
+  - name: TauES_DM1
+    type: auto
+    categories: ^.*
+  - name: TauES_3prong
+    type: auto
+    categories: ^.*
+  - name: EleFakingTauES_DM0
+    type: auto
+    categories: ^.*
+  - name: EleFakingTauES_DM1
+    type: auto
+    categories: ^.*
+  - name: MuFakingTauES
+    type: auto
+    categories: ^.*
+  - name: JER
+    type: auto
+    categories: ^.*
+  - name: JES_FlavorQCD
+    type: auto
+    categories: ^.*
+  - name: JES_RelativeBal
+    type: auto
+    categories: ^.*
+  - name: JES_HF
+    type: auto
+    categories: ^.*
+  - name: JES_BBEC1
+    type: auto
+    categories: ^.*
+  - name: JES_EC2
+    type: auto
+    categories: ^.*
+  - name: JES_Absolute
+    type: auto
+    categories: ^.*
+  - name: JES_Total
+    type: auto
+    categories: ^.*
+  - name: JES_BBEC1_2018
+    type: auto
+    categories: ^.*
+    eras: Run2_2018
+  - name: JES_Absolute_2018
+    type: auto
+    categories: ^.*
+    eras: Run2_2018
+  - name: JES_EC2_2018
+    type: auto
+    categories: ^.*
+    eras: Run2_2018
+  - name: JES_HF_2018
+    type: auto
+    categories: ^.*
+    eras: Run2_2018
+  - name: JES_RelativeSample_2018
+    type: auto
+    categories: ^.*
+    eras: Run2_2018
+  - name: JES_BBEC1_2017
+    type: auto
+    categories: ^.*
+    eras: Run2_2017
+  - name: JES_Absolute_2017
+    type: auto
+    categories: ^.*
+    eras: Run2_2017
+  - name: JES_EC2_2017
+    type: auto
+    categories: ^.*
+    eras: Run2_2017
+  - name: JES_HF_2017
+    type: auto
+    categories: ^.*
+    eras: Run2_2017
+  - name: JES_RelativeSample_2017
+    type: auto
+    categories: ^.*
+    eras: Run2_2017
+  - name: JES_BBEC1_2016preVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016_HIPM
+  - name: JES_Absolute_2016preVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016_HIPM
+  - name: JES_EC2_2016preVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016_HIPM
+  - name: JES_HF_2016preVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016_HIPM
+  - name: JES_RelativeSample_2016preVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016_HIPM
+  - name: JES_BBEC1_2016postVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016
+  - name: JES_Absolute_2016postVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016
+  - name: JES_EC2_2016postVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016
+  - name: JES_HF_2016postVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016
+  - name: JES_RelativeSample_2016postVFP
+    type: auto
+    categories: ^.*
+    eras: Run2_2016
+  - name: xs_ST_tW_antitop
+    type: lnN
+    value: 0.02346
+    processes: ST_tW_antitop
+  - name: xs_ST_tW_top
+    type: lnN
+    value: 0.02817
+    processes: ST_tW_top
+  - name: xs_ST_t-channel_antitop
+    type: lnN
+    value: 0.4613
+    processes: ST_t-channel_antitop
+  - name: xs_ST_t-channel_top
+    type: lnN
+    value: 0.9153
+    processes: ST_t-channel_top
+  - name: xs_WGToLNuG
+    type: lnN
+    value: 1.027
+    processes: WGToLNuG
+  - name: xs_EWK_WplusToLNu
+    type: lnN
+    value: 0.0291
+    processes: EWK_WplusToLNu
+  - name: xs_EWK_WminusToLNu
+    type: lnN
+    value: 0.02492
+    processes: EWK_WminusToLNu
+  - name: xs_EWK_ZTo2L
+    type: lnN
+    value: 0.004456
+    processes: EWK_ZTo2L
+  - name: xs_EWK_ZTo2Nu
+    type: lnN
+    value: 0.008396
+    processes: EWK_ZTo2Nu
+  - name: xs_EWKWMinus2Jets_WToLNu_M-50
+    type: lnN
+    value: 0.02492
+    processes: EWKWMinus2Jets_WToLNu_M-50
+  - name: xs_EWKWPlus2Jets_WToLNu_M-50
+    type: lnN
+    value: 0.0291
+    processes: EWKWPlus2Jets_WToLNu_M-50
+  - name: xs_EWKZ2Jets_ZToLL_M-50
+    type: lnN
+    value: 0.004456
+    processes: EWKZ2Jets_ZToLL_M-50
+  - name: xs_TTWJetsToLNu
+    type: lnN
+    value: 0.0008017
+    processes: TTWJetsToLNu
+  - name: xs_TTWJetsToQQ
+    type: lnN
+    value: 0.001622
+    processes: TTWJetsToQQ
+  - name: xs_TTZToLLNuNu_M-10
+    type: lnN
+    value: 0.0002995
+    processes: TTZToLLNuNu_M-10
+  - name: xs_TTZToQQ_Dilept
+    type: lnN
+    value: 8.059e-05
+    processes: TTZToQQ_Dilept
+  - name: xs_TTWW
+    type: lnN
+    value: 5.288e-06
+    processes: TTWW
+  - name: xs_TTWZ
+    type: lnN
+    value: 1.623e-06
+    processes: TTWZ
+  - name: xs_TTWH
+    type: lnN
+    value: 6.007e-07
+    processes: TTWH
+  - name: xs_TTZH
+    type: lnN
+    value: 8.716e-07
+    processes: TTZH
+  - name: xs_TTZZ
+    type: lnN
+    value: 1.28e-06
+    processes: TTZZ
+  - name: xs_ZZTo4L
+    type: lnN
+    value: 0.00122
+    processes: ZZTo4L
+  - name: xs_ZZTo2L2Nu
+    type: lnN
+    value: 0.0009971
+    processes: ZZTo2L2Nu
+  - name: xs_ZZTo2Q2L
+    type: lnN
+    value: 0.001657
+    processes: ZZTo2Q2L
+  - name: xs_ZZTo2Q2Nu
+    type: lnN
+    value: 0.01533
+    processes: ZZTo2Q2Nu
+  - name: xs_ZZTo4Q
+    type: lnN
+    value: 6.328e-03
+    processes: ZZTo4Q
+  - name: xs_WZTo1L3Nu
+    type: lnN
+    value: 0.0366
+    processes: WZTo1L3Nu
+  - name: xs_WZTo3LNu
+    type: lnN
+    value: 0.01618
+    processes: WZTo3LNu
+  - name: xs_WZTo1L1Nu2Q
+    type: lnN
+    value: 0.01618
+    processes: WZTo1L1Nu2Q
+  - name: xs_WZTo2Q2L
+    type: lnN
+    value: 0.01984
+    processes: WZTo2Q2L
+  - name: xs_WWTo2L2Nu
+    type: lnN
+    value: 0.00704
+    processes: WWTo2L2Nu
+  - name: xs_WWTo4Q
+    type: lnN
+    value: 4.849e-02
+    processes: WWTo4Q
+  - name: xs_ZZZ
+    type: lnN
+    value: 2.5e-06
+    processes: ZZZ
+  - name: xs_WZZ
+    type: lnN
+    value: 6.213e-05
+    processes: WZZ
+  - name: xs_WWW_4F
+    type: lnN
+    value: 0.0002479
+    processes: WWW_4F
+  - name: xs_WWZ_4F
+    type: lnN
+    value: 0.0001757
+    processes: WWZ_4F
+
+  - name: xs_ZH_HToBB_ZToLL
+    type: lnN
+    value:
+    processes: ZH_HToBB_ZToLL
+  - name: xs_ZH_HToBB_ZToQQ
+    type: lnN
+    value:
+    processes: ZH_HToBB_ZToQQ
+  - name: xs_ggHToZZTo2L2Q
+    type: lnN
+    value: 0.02027
+    processes: ggHToZZTo2L2Q
+  - name: xs_ZHToTauTau
+    type: lnN
+    value:
+    processes: ZHToTauTau
+  - name: xs_WplusHToTauTau
+    type: lnN
+    value:
+    processes: WplusHToTauTau
+  - name: xs_WminusHToTauTau
+    type: lnN
+    value:
+    processes: WminusHToTauTau
+  - name: xs_VBFHToTauTau
+    type: lnN
+    value:
+    processes: VBFHToTauTau
+  - name: xs_GluGluHToTauTau
+    type: lnN
+    value:
+    processes: GluGluHToTauTau
+  - name: xs_WW
+    type: lnN
+    value: 0.1124
+    processes: WW
+  - name: xs_WWTo1L1Nu2Q
+    type: lnN
+    value: 0.5404
+    processes: WWTo1L1Nu2Q
+  - name: xs_WZ
+    type: lnN
+    value: 0.03993
+    processes: WZ
+  - name: xs_ggHH_bbTauTau_SM
+    type: lnN
+    value:
+    processes: ggHH_bbTauTau_SM
+  - name: xs_GluGluHToWWTo2L2Nu
+    type: lnN
+    value: 0.01033
+    processes: GluGluHToWWTo2L2Nu
+  - name: xs_VBFHToWWTo2L2Nu
+    type: lnN
+    value: 0.01575
+    processes: VBFHToWWTo2L2Nu
+  - name: xs_HWplusJ_HToWW
+    type: lnN
+    value: 0.0006877
+    processes: HWplusJ_HToWW
+  - name: xs_HWminusJ_HToWW
+    type: lnN
+    value: 0.0004197
+    processes: HWminusJ_HToWW
+  - name: xs_HZJ_HToWW
+    type: lnN
+    value: 0.1618
+    processes: HZJ_HToWW
+  - name: xs_GluGluZH_HToWW_ZTo2L
+    type: lnN
+    value: 6.763e-06
+    processes: GluGluZH_HToWW_ZTo2L
+  - name: xs_TTZToBB
+    type: lnN
+    value: 0.0001631
+    processes: TTZToBB
+  - name: xs_TTZToNuNu
+    type: lnN
+    value: 0.0001971
+    processes: TTZToNuNu
+  - name: xs_TTZToQQ_Dilept
+    type: lnN
+    value: 8.059e-05
+    processes: TTZToQQ_Dilept
+  - name: xs_ZToQQ
+    type: lnN
+    value: 6.328e-03
+    processes: ZZTo4Q
+  - name: xs_TTZToQQ
+    type: lnN
+    value: 0.0007264
+    processes: TTZToQQ
+  - name: xs_TTGJets
+    type: lnN
+    value: 0.02243
+    processes: TTGJets
+  - name: xs_TTGG
+    type: lnN
+    value: 3.287e-05
+    processes: TTGG
+  - name: xs_TTGamma_Dilept
+    type: lnN
+    value: 0.001264
+    processes: TTGamma_Dilept
+  - name: xs_TTGamma_Hadronic
+    type: lnN
+    value: 0.003734
+    processes: TTGamma_Hadronic
+  - name: xs_TTGamma_SingleLept
+    type: lnN
+    value: 0.00342
+    processes: TTGamma_SingleLept
+  - name: xs_TTTJ
+    type: lnN
+    value: 2.299e-7
+    processes: TTTJ
+  - name: xs_TTTT
+    type: lnN
+    value: 1.189e-05
+    processes: TTTT
+  - name: xs_TTTW
+    type: lnN
+    value: 4.889e-07
+    processes: TTTW
+  - name: xs_TTZZTo4b
+    type: lnN
+    value: 1.006e-06
+    processes: TTZZTo4b
+  - name: xs_TTZZToNon4b
+    type: lnN
+    value: 1.006e-06
+    processes: TTZZToNon4b
+  - name: xs_TT4b
+    type: lnN
+    value: 5.292e-05
+    processes: TT4b
+  - name: xs_TTZHTo4b
+    type: lnN
+    value: 7.972e-07
+    processes: TTZHTo4b
+  - name: xs_TTZHToNon4b
+    type: lnN
+    value: 7.889e-07
+    processes: TTZHToNon4b
+  - name: xs_TTZToLL_M-1to10
+    type: lnN
+    value: 6.537e-05
+    processes: TTZToLL_M-1to10
+  - name: xs_TTHHTo4b
+    type: lnN
+    value: 4.633e-06
+    processes: TTHHTo4b
+  - name: xs_TTHHTo2B2Tau
+    type: lnN
+    value: 4.633e-06
+    processes: TTHHTo2B2Tau
+  - name: xs_TTHHToNon4b
+    type: lnN
+    value: 4.628e-07
+    processes: TTHHToNon4b
+  - name: xs_TTHH
+    type: lnN
+    value: 5.345e-07
+    processes: TTHH
+  - name: xs_ZZ
+    type: lnN
+    value: 0.01966
+    processes: ZZ
+
 autolnNThr: 0.1
 asymlnNThr: 0.001
 ignorelnNThr: 0.001
