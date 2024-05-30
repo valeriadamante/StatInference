@@ -4,7 +4,7 @@ model:
   parameters: [ MX ]
   param_dependent_bkg: true
   input_file_pattern: ${ERA}/shape_m${MX}.root
-hist_bins: [ 0, 0.7, 1 ]
+#hist_bins: [ 0, 0.7, 1 ]
 eras:
   - Run3_2022EE
 channels:
@@ -27,6 +27,7 @@ processes:
   - TT
   - DY
   - ST
+  - VV
   # - Other
 uncertainties:
   - name: lumi_13TeV
