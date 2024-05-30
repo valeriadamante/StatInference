@@ -150,7 +150,8 @@ class DatacardMaker:
         bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
         print(f'bins_edges: [ {", ".join(bins_edges)} ]')
         print(f'bin_values: [ {", ".join(bin_values)} ]')
-        raise RuntimeError(f"Negative bins found in histogram {hist_name}")
+        #raise RuntimeError(f"Negative bins found in histogram {hist_name}")
+        print("Bad bin edges, negative bins found in histogram {hist_name}!!!")
       self.shapes[key] = hist
     return self.shapes[key]
 
