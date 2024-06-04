@@ -250,7 +250,7 @@ uncertainties:
   - name: PileUp_Lumi_MC
     type: auto
     categories: ^.*
-  - name: #TrigSF_singleTau
+  - name: TrigSF_singleTau
     type: auto
     categories: ^.*
   - name: L1Prefiring
@@ -281,9 +281,6 @@ uncertainties:
     type: auto
     categories: ^.*
   - name: MuFakingTauES
-    type: auto
-    categories: ^.*
-  - name: JER
     type: auto
     categories: ^.*
   - name: JES_FlavorQCD
@@ -532,38 +529,38 @@ uncertainties:
     value: 0.0001757
     processes: WWZ_4F
 
-  - name: xs_ZH_HToBB_ZToLL
-    type: lnN
-    value:
-    processes: ZH_HToBB_ZToLL
-  - name: xs_ZH_HToBB_ZToQQ
-    type: lnN
-    value:
+  #- name: xs_ZH_HToBB_ZToLL
+  #  type: lnN
+  #  value:
+  #  processes: ZH_HToBB_ZToLL
+  #- name: xs_ZH_HToBB_ZToQQ
+  #  type: lnN
+  #  value:
     processes: ZH_HToBB_ZToQQ
   - name: xs_ggHToZZTo2L2Q
     type: lnN
     value: 0.02027
     processes: ggHToZZTo2L2Q
-  - name: xs_ZHToTauTau
-    type: lnN
-    value:
-    processes: ZHToTauTau
-  - name: xs_WplusHToTauTau
-    type: lnN
-    value:
-    processes: WplusHToTauTau
-  - name: xs_WminusHToTauTau
-    type: lnN
-    value:
-    processes: WminusHToTauTau
-  - name: xs_VBFHToTauTau
-    type: lnN
-    value:
-    processes: VBFHToTauTau
-  - name: xs_GluGluHToTauTau
-    type: lnN
-    value:
-    processes: GluGluHToTauTau
+  #- name: xs_ZHToTauTau
+  #  type: lnN
+  #  value:
+  #  processes: ZHToTauTau
+  #- name: xs_WplusHToTauTau
+  #  type: lnN
+  #  value:
+  #  processes: WplusHToTauTau
+  #- name: xs_WminusHToTauTau
+  #  type: lnN
+  #  value:
+  #  processes: WminusHToTauTau
+  #- name: xs_VBFHToTauTau
+  #  type: lnN
+  #  value:
+  #  processes: VBFHToTauTau
+  #- name: xs_GluGluHToTauTau
+  #  type: lnN
+  #  value:
+  #  processes: GluGluHToTauTau
   - name: xs_WW
     type: lnN
     value: 0.1124
@@ -576,10 +573,10 @@ uncertainties:
     type: lnN
     value: 0.03993
     processes: WZ
-  - name: xs_ggHH_bbTauTau_SM
-    type: lnN
-    value:
-    processes: ggHH_bbTauTau_SM
+  #- name: xs_ggHH_bbTauTau_SM
+  #  type: lnN
+  #  value:
+  #  processes: ggHH_bbTauTau_SM
   - name: xs_GluGluHToWWTo2L2Nu
     type: lnN
     value: 0.01033
