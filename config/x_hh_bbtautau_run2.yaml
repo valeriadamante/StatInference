@@ -35,1117 +35,702 @@ uncertainties:
     value: 0.03
     #processes: ^.*$
   - name: pdf_gg
-    type: lnN
+    type: auto
     value: 1.042
     processes: [TTToSemiLeptonic, TTTo2L2Nu, TTToHadronic]
-  - name: CMS_scale_t_DM0_2016
+  - name: CMS_btag_HF
     type: auto
-    eras: [2016]
-  - name: CMS_scale_t_DM0_2017
+    eras: ["2016", "2016_HIPM", "2017", "2018"]
+  - name: CMS_btag_LF
     type: auto
-    eras: [2017]
-  - name: CMS_scale_t_DM0_2018
+    eras: ["2016", "2016_HIPM", "2017", "2018"]
+  - name: CMS_btag_cferr1
     type: auto
-    eras: [2018]
-  - name: CMS_scale_t_DM0_2016_HIPM
+    eras: ["2016", "2016_HIPM", "2017", "2018"]
+  - name: CMS_btag_cferr2
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_t_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_t_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_t_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_t_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_t_3prong_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_t_3prong_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_t_3prong_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_t_3prong_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_t_eFake_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_t_eFake_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_t_eFake_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_t_eFake_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_t_eFake_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_t_eFake_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_t_eFake_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_t_eFake_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_t_muFake_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_t_muFake_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_t_muFake_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_t_muFake_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_res_j_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_res_j_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_res_j_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_res_j_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_FlavorQCD_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_FlavorQCD_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_FlavorQCD_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_FlavorQCD_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeBal_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeBal_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeBal_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeBal_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  #- name: CMS_scale_j_Total_2016
-  #  type: auto
-  #  eras: [2016]
-  #- name: CMS_scale_j_Total_2017
-  #  type: auto
-  #  eras: [2017]
-  #- name: CMS_scale_j_Total_2018
-  #  type: auto
-  #  eras: [2018]
-  #- name: CMS_scale_j_Total_2016_HIPM
-  #  type: auto
-  #  eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2018_2018
-    type: auto
-    eras: [2018]
-
-  - name: CMS_scale_j_BBEC1_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2017_2017
-    type: auto
-    eras: [2017]
-
-  - name: CMS_scale_j_BBEC1_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
-    type: auto
-    eras: [2016]
-
-  - name: CMS_scale_j_BBEC1_2016postVFP_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-
-  - name: CMS_eff_e_id_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_e_id_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_e_id_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_e_id_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_highpt_id_HighPtID_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_highpt_id_HighPtID_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_highpt_id_HighPtID_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_highpt_id_HighPtID_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_highpt_id_HighPtIDIso_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_highpt_id_HighPtIDIso_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_highpt_id_HighPtIDIso_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_highpt_id_HighPtIDIso_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_highpt_id_Reco_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_highpt_id_Reco_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_highpt_id_Reco_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_highpt_id_Reco_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_highpt_id_TightID_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_highpt_id_TightID_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_highpt_id_TightID_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_highpt_id_TightID_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_id_highptid2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_id_highptid2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_id_highptid2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_id_highptid2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_id_HighPtIso_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_id_HighPtIso_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_id_HighPtIso_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_id_HighPtIso_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_id_Reco_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_id_Reco_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_id_Reco_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_id_Reco_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_id_TightID_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_id_TightID_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_id_TightID_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_id_TightID_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_m_id_TightIDIso_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_m_id_TightIDIso_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_m_id_TightIDIso_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_m_id_TightIDIso_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_total_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_total_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_total_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_total_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat1_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat1_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat1_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat1_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat1_DM10_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat1_DM10_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat1_DM10_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat1_DM10_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat1_DM11_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat1_DM11_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat1_DM11_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat1_DM11_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat1_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat1_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat1_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat1_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat2_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat2_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat2_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat2_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat2_DM10_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat2_DM10_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat2_DM10_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat2_DM10_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat2_DM11_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat2_DM11_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat2_DM11_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat2_DM11_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat2_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat2_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat2_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat2_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_alleras_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_alleras_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_alleras_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_alleras_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_year_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_year_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_year_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_year_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_year_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_year_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_year_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_year_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_year_DM10_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_year_DM10_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_year_DM10_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_year_DM10_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_year_DM11_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_year_DM11_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_year_DM11_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_year_DM11_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_year_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_year_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_year_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_year_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_etauFR_barrel_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_etauFR_barrel_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_etauFR_barrel_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_etauFR_barrel_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_etauFR_endcaps_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_etauFR_endcaps_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_etauFR_endcaps_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_etauFR_endcaps_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat_highpT_bin1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat_highpT_bin1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat_highpT_bin1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat_highpT_bin1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_stat_highpT_bin2_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_stat_highpT_bin2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_stat_highpT_bin2_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_stat_highpT_bin2_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_highpT_bin1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_highpT_bin1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_highpT_bin1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_highpT_bin1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_highpT_bin2_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_highpT_bin2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_highpT_bin2_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_highpT_bin2_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_eff_t_id_syst_highpT_extrap_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_eff_t_id_syst_highpT_extrap_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_t_id_syst_highpT_extrap_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_eff_t_id_syst_highpT_extrap_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigdiTau_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigdiTau_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigdiTau_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigdiTau_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigdiTau_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigdiTau_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigdiTau_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigdiTau_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigdiTau_3Prong_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigdiTau_3Prong_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigdiTau_3Prong_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigdiTau_3Prong_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigsingleEle_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigsingleEle_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigsingleEle_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigsingleEle_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigsingleMu_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigsingleMu_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigsingleMu_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigsingleMu_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigeTau_Ele_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigeTau_Ele_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigeTau_Ele_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigeTau_Ele_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigeTau_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigeTau_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigeTau_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigeTau_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigeTau_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigeTau_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigeTau_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigeTau_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigeTau_3Prong_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigeTau_3Prong_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigeTau_3Prong_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigeTau_3Prong_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigmuTau_Mu_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigmuTau_Mu_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigmuTau_Mu_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigmuTau_Mu_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigmuTau_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigmuTau_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigmuTau_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigmuTau_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigmuTau_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigmuTau_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigmuTau_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigmuTau_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trigmuTau_3Prong_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trigmuTau_3Prong_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trigmuTau_3Prong_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trigmuTau_3Prong_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgetau_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgetau_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgetau_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgetau_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgetau_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgetau_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgetau_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgetau_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgetau_ele_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgetau_ele_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgetau_ele_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgetau_ele_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgmutau_3Prong_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgmutau_3Prong_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgmutau_3Prong_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgmutau_3Prong_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgmutau_DM0_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgmutau_DM0_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgmutau_DM0_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgmutau_DM0_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgmutau_DM1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgmutau_DM1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgmutau_DM1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgmutau_DM1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgmutau_mu_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgmutau_mu_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgmutau_mu_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgmutau_mu_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgsingleEle_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgsingleEle_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgsingleEle_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgsingleEle_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_bbtt_trgsingleMu24_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_bbtt_trgsingleMu24_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_bbtt_trgsingleMu24_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_bbtt_trgsingleMu24_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_lf_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_btag_lf_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_lf_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_btag_lf_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_hf_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_btag_hf_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_hf_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_btag_hf_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_lfstats1_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_btag_lfstats1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_lfstats1_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_btag_lfstats1_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_lfstats2_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_btag_lfstats2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_lfstats2_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_btag_lfstats2_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
+    eras: ["2016", "2016_HIPM", "2017", "2018"]
   - name: CMS_btag_hfstats1_2016
     type: auto
-    eras: [2016]
-  - name: CMS_btag_hfstats1_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_hfstats1_2018
-    type: auto
-    eras: [2018]
+    eras: ["2016"]
   - name: CMS_btag_hfstats1_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
+    eras: ["2016_HIPM"]
+  - name: CMS_btag_hfstats1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_btag_hfstats1_2018
+    type: auto
+    eras: ["2018"]
   - name: CMS_btag_hfstats2_2016
     type: auto
-    eras: [2016]
-  - name: CMS_btag_hfstats2_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_btag_hfstats2_2018
-    type: auto
-    eras: [2018]
+    eras: ["2016"]
   - name: CMS_btag_hfstats2_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_cferr1_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_btag_hfstats2_2017
     type: auto
-    eras: [2016]
-  - name: CMS_btag_cferr1_2017
+    eras: ["2017"]
+  - name: CMS_btag_hfstats2_2018
     type: auto
-    eras: [2017]
-  - name: CMS_btag_cferr1_2018
+    eras: ["2018"]
+  - name: CMS_btag_lfstats1_2016
     type: auto
-    eras: [2018]
-  - name: CMS_btag_cferr1_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_btag_lfstats1_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_btag_cferr2_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_btag_lfstats1_2017
     type: auto
-    eras: [2016]
-  - name: CMS_btag_cferr2_2017
+    eras: ["2017"]
+  - name: CMS_btag_lfstats1_2018
     type: auto
-    eras: [2017]
-  - name: CMS_btag_cferr2_2018
+    eras: ["2018"]
+  - name: CMS_btag_lfstats2_2016
     type: auto
-    eras: [2018]
-  - name: CMS_btag_cferr2_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_btag_lfstats2_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
+    eras: ["2016_HIPM"]
+  - name: CMS_btag_lfstats2_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_btag_lfstats2_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_e_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_e_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_e_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_e_2018
+    type: auto
+    eras: ["2018"]
   - name: CMS_eff_j_PUJET_id_2016
     type: auto
-    eras: [2016]
-  - name: CMS_eff_j_PUJET_id_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_eff_j_PUJET_id_2018
-    type: auto
-    eras: [2018]
+    eras: ["2016"]
   - name: CMS_eff_j_PUJET_id_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_pileup_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_j_PUJET_id_2017
     type: auto
-    eras: [2016]
-  - name: CMS_pileup_2017
+    eras: ["2017"]
+  - name: CMS_eff_j_PUJET_id_2018
     type: auto
-    eras: [2017]
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat1_DM0_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat1_DM0_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat1_DM0_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat1_DM0_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat1_DM10_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat1_DM10_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat1_DM10_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat1_DM10_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat1_DM11_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat1_DM11_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat1_DM11_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat1_DM11_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat1_DM1_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat1_DM1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat1_DM1_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat1_DM1_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat2_DM0_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat2_DM0_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat2_DM0_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat2_DM0_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat2_DM10_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat2_DM10_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat2_DM10_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat2_DM10_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat2_DM11_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat2_DM11_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat2_DM11_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat2_DM11_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat2_DM1_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat2_DM1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat2_DM1_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat2_DM1_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+
+  - name: CMS_eff_t_id_syst_alleras
+    type: auto
+    eras: ["2016", "2016_HIPM", "2017","2018"]
+  - name: CMS_eff_t_id_syst_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_syst_2018_DM0
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_syst_2018_DM10
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_syst_2018_DM11
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_syst_2018_DM1
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_syst_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_syst_2017_DM0
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_syst_2017_DM10
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_syst_2017_DM11
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_syst_2017_DM1
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_syst_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_syst_2016_DM0
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_syst_2016_DM10
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_syst_2016_DM11
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_syst_2016_DM1
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_syst_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_syst_2016_HIPM_DM0
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_syst_2016_HIPM_DM10
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_syst_2016_HIPM_DM11
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_syst_2016_HIPM_DM1
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_etauFR_barrel_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_etauFR_barrel_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_etauFR_barrel_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_etauFR_barrel_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_etauFR_endcaps_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_etauFR_endcaps_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_etauFR_endcaps_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_etauFR_endcaps_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_mutauFR_eta0p4to0p8_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_mutauFR_eta0p8to1p2_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_mutauFR_eta1p2to1p7_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_mutauFR_etaGt1p7_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_mutauFR_etaLt0p4_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat_highpT_bin1_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat_highpT_bin1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat_highpT_bin1_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat_highpT_bin1_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_stat_highpT_bin2_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_eff_t_id_stat_highpT_bin2_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_eff_t_id_stat_highpT_bin2_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_eff_t_id_stat_highpT_bin2_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_eff_t_id_syst_highpT_bin1
+    type: auto
+    eras: ["2016","2016_HIPM", "2017","2018"]
+  - name: CMS_eff_t_id_syst_highpT_bin2
+    type: auto
+    eras: ["2016","2016_HIPM", "2017","2018"]
+  - name: CMS_eff_t_id_syst_highpT_extrap
+    type: auto
+    eras: ["2016","2016_HIPM", "2017","2018"]
+  - name: CMS_l1_prefiring_2017
+    type: lnN
+    eras: ["2017"]
+  - name: CMS_l1_prefiring_2016
+    type: lnN
+    eras: ["2016"]
+  - name: CMS_l1_prefiring_2016_HIPM
+    type: lnN
+    eras: ["2016_HIPM"]
+  #- name: CMS_l1_prefiring_2018
+    #type: auto
+    #eras: ["2018"]
+  - name: CMS_l1_ecal_prefiring_2017
+    type: lnN
+    eras: ["2017"]
+  - name: CMS_l1_ecal_prefiring_2016
+    type: lnN
+    eras: ["2016"]
+  - name: CMS_l1_ecal_prefiring_2016_HIPM
+    type: lnN
+    eras: ["2016_HIPM"]
+  #- name: CMS_l1_ecal_prefiring_2018
+    #type: auto
+    #eras: ["2018"]
+  - name: CMS_l1_muon_stat_prefiring_2017
+    type: lnN
+    eras: ["2017"]
+  - name: CMS_l1_muon_stat_prefiring_2016
+    type: lnN
+    eras: ["2016"]
+  - name: CMS_l1_muon_stat_prefiring_2016_HIPM
+    type: lnN
+    eras: ["2016_HIPM"]
+  #- name: CMS_l1_muon_stat_prefiring_2018
+    #type: auto
+    #eras: ["2018"]
+  - name: CMS_l1_muon_syst_prefiring_2017
+    type: lnN
+    eras: ["2017"]
+  - name: CMS_l1_muon_syst_prefiring_2016
+    type: lnN
+    eras: ["2016"]
+  - name: CMS_l1_muon_syst_prefiring_2016_HIPM
+    type: lnN
+    eras: ["2016_HIPM"]
+  #- name: CMS_l1_muon_syst_prefiring_2018
+    #type: auto
+    #eras: ["2018"]
   - name: CMS_pileup_2018
     type: auto
-    eras: [2018]
+    eras: ["2018"]
+  - name: CMS_pileup_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_pileup_2016
+    type: auto
+    eras: ["2016"]
   - name: CMS_pileup_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_l1_prefiring_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_DM0_2018
     type: auto
-    eras: [2016]
-  - name: CMS_l1_prefiring_2017
+    eras: ["2018"]
+  - name: CMS_scale_t_DM0_2017
     type: auto
-    eras: [2017]
-  - name: CMS_l1_prefiring_2018
+    eras: ["2017"]
+  - name: CMS_scale_t_DM0_2016
     type: auto
-    eras: [2018]
-  - name: CMS_l1_prefiring_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_scale_t_DM0_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_l1_ecal_prefiring_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_DM1_2018
     type: auto
-    eras: [2016]
-  - name: CMS_l1_ecal_prefiring_2017
+    eras: ["2018"]
+  - name: CMS_scale_t_DM1_2017
     type: auto
-    eras: [2017]
-  - name: CMS_l1_ecal_prefiring_2018
+    eras: ["2017"]
+  - name: CMS_scale_t_DM1_2016
     type: auto
-    eras: [2018]
-  - name: CMS_l1_ecal_prefiring_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_scale_t_DM1_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_l1_muon_stat_prefiring_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_3prong_2018
     type: auto
-    eras: [2016]
-  - name: CMS_l1_muon_stat_prefiring_2017
+    eras: ["2018"]
+  - name: CMS_scale_t_3prong_2017
     type: auto
-    eras: [2017]
-  - name: CMS_l1_muon_stat_prefiring_2018
+    eras: ["2017"]
+  - name: CMS_scale_t_3prong_2016
     type: auto
-    eras: [2018]
-  - name: CMS_l1_muon_stat_prefiring_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_scale_t_3prong_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
-  - name: CMS_l1_muon_syst_prefiring_2016
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_eFake_DM0_2018
     type: auto
-    eras: [2016]
-  - name: CMS_l1_muon_syst_prefiring_2017
+    eras: ["2018"]
+  - name: CMS_scale_t_eFake_DM0_2017
     type: auto
-    eras: [2017]
-  - name: CMS_l1_muon_syst_prefiring_2018
+    eras: ["2017"]
+  - name: CMS_scale_t_eFake_DM0_2016
     type: auto
-    eras: [2018]
-  - name: CMS_l1_muon_syst_prefiring_2016_HIPM
+    eras: ["2016"]
+  - name: CMS_scale_t_eFake_DM0_2016_HIPM
     type: auto
-    eras: [2016_HIPM]
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_eFake_DM1_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_t_eFake_DM1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_t_eFake_DM1_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_t_eFake_DM1_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_t_muFake_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_t_muFake_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_t_muFake_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_t_muFake_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_res_j_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_res_j_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_res_j_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_res_j_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_j_Abs
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_Abs_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_j_Abs_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_j_Abs_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_j_Abs_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_j_BBEC1
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_BBEC1_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_j_BBEC1_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_j_BBEC1_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_j_BBEC1_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_j_EC2
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_EC2_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_j_EC2_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_j_EC2_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_j_EC2_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_j_FlavQCD
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_HF
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_HF_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_j_HF_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_j_HF_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_j_HF_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+  - name: CMS_scale_j_RelBal
+    type: auto
+    eras: ["2018", "2017", "2016", "2016_HIPM"]
+  - name: CMS_scale_j_RelSample_2018
+    type: auto
+    eras: ["2018"]
+  - name: CMS_scale_j_RelSample_2017
+    type: auto
+    eras: ["2017"]
+  - name: CMS_scale_j_RelSample_2016
+    type: auto
+    eras: ["2016"]
+  - name: CMS_scale_j_RelSample_2016_HIPM
+    type: auto
+    eras: ["2016_HIPM"]
+
+  #- name: CMS_eff_m_highpt_id_HighPtID_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_highpt_id_HighPtID_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_highpt_id_HighPtID_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_highpt_id_HighPtID_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_highpt_id_Reco_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_highpt_id_Reco_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_highpt_id_Reco_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_highpt_id_Reco_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_highpt_id_TightID_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_highpt_id_TightID_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_highpt_id_TightID_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_highpt_id_TightID_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_id_highptid
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_id_highpti7
+  #  type: auto
+  #  eras: ["20187]
+  #- name: CMS_eff_m_id_highpti6
+  #  type: auto
+  #  eras: ["20186]
+  #- name: CMS_eff_m_id_highpti6_HIPM
+  #  type: auto
+  #  eras: ["20186_HIPM]
+  #- name: CMS_eff_m_id_HighPtIso_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_id_HighPtIso_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_id_HighPtIso_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_id_HighPtIso_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_id_Reco_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_id_Reco_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_id_Reco_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_id_Reco_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_id_TightID_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_id_TightID_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_id_TightID_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_id_TightID_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+  #- name: CMS_eff_m_id_TightIDIso_2018
+  #  type: auto
+  #  eras: ["2018"]
+  #- name: CMS_eff_m_id_TightIDIso_2017
+  #  type: auto
+  #  eras: ["2017"]
+  #- name: CMS_eff_m_id_TightIDIso_2016
+  #  type: auto
+  #  eras: ["2016"]
+  #- name: CMS_eff_m_id_TightIDIso_2016_HIPM
+  #  type: auto
+  #  eras: ["2016_HIPM"]
+
 autolnNThr: 0.1
 asymlnNThr: 0.001
 ignorelnNThr: 0.001
