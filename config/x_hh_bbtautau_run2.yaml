@@ -194,37 +194,19 @@ uncertainties:
   - name: CMS_scale_j_Absolute_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Total_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Total_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Total_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Total_2016_HIPM
-    type: auto
-    eras: [2016_HIPM]
+  #- name: CMS_scale_j_Total_2016
+  #  type: auto
+  #  eras: [2016]
+  #- name: CMS_scale_j_Total_2017
+  #  type: auto
+  #  eras: [2017]
+  #- name: CMS_scale_j_Total_2018
+  #  type: auto
+  #  eras: [2018]
+  #- name: CMS_scale_j_Total_2016_HIPM
+  #  type: auto
+  #  eras: [2016_HIPM]
   - name: CMS_scale_j_BBEC1_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2018_2018
     type: auto
     eras: [2018]
   - name: CMS_scale_j_Absolute_2018_2018
@@ -233,58 +215,14 @@ uncertainties:
   - name: CMS_scale_j_EC2_2018_2018
     type: auto
     eras: [2018]
-  - name: CMS_scale_j_EC2_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2018_2018
-    type: auto
-    eras: [2018]
   - name: CMS_scale_j_HF_2018_2018
     type: auto
     eras: [2018]
   - name: CMS_scale_j_RelativeSample_2018_2018
     type: auto
     eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2018_2018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2018_2018
-    type: auto
-    eras: [2018]
+
   - name: CMS_scale_j_BBEC1_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2017_2017
     type: auto
     eras: [2017]
   - name: CMS_scale_j_Absolute_2017_2017
@@ -293,58 +231,14 @@ uncertainties:
   - name: CMS_scale_j_EC2_2017_2017
     type: auto
     eras: [2017]
-  - name: CMS_scale_j_EC2_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2017_2017
-    type: auto
-    eras: [2017]
   - name: CMS_scale_j_HF_2017_2017
     type: auto
     eras: [2017]
   - name: CMS_scale_j_RelativeSample_2017_2017
     type: auto
     eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2017_2017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2017_2017
-    type: auto
-    eras: [2017]
+
   - name: CMS_scale_j_BBEC1_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016preVFP_2016
     type: auto
     eras: [2016]
   - name: CMS_scale_j_Absolute_2016preVFP_2016
@@ -353,99 +247,29 @@ uncertainties:
   - name: CMS_scale_j_EC2_2016preVFP_2016
     type: auto
     eras: [2016]
-  - name: CMS_scale_j_EC2_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016preVFP_2016
-    type: auto
-    eras: [2016]
   - name: CMS_scale_j_HF_2016preVFP_2016
     type: auto
     eras: [2016]
   - name: CMS_scale_j_RelativeSample_2016preVFP_2016
     type: auto
     eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016postVFP_2016
+
+  - name: CMS_scale_j_BBEC1_2016postVFP_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016postVFP_2016
+  - name: CMS_scale_j_Absolute_2016postVFP_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016postVFP_2016
+  - name: CMS_scale_j_EC2_2016postVFP_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016postVFP_2016
+  - name: CMS_scale_j_HF_2016postVFP_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_2016
+  - name: CMS_scale_j_RelativeSample_2016postVFP_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
-    type: auto
-    eras: [2016_HIPM]
+
   - name: CMS_eff_e_id_2016
     type: auto
     eras: [2016]
