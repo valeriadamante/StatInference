@@ -206,244 +206,244 @@ uncertainties:
   - name: CMS_scale_j_Total_2016_HIPM
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2018_20182016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2018_20182017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2018_20182018
+  - name: CMS_scale_j_BBEC1_2018_2018
     type: auto
     eras: [2018]
-  - name: CMS_scale_j_BBEC1_2018_20182016_HIPM
+  - name: CMS_scale_j_BBEC1_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_BBEC1_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_BBEC1_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_Absolute_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_Absolute_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_Absolute_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_Absolute_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_EC2_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_EC2_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_EC2_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_EC2_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_HF_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_HF_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_HF_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_HF_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_RelativeSample_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_RelativeSample_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_RelativeSample_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_RelativeSample_2018_2018
+    type: auto
+    eras: [2018]
+  - name: CMS_scale_j_BBEC1_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_BBEC1_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_BBEC1_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_BBEC1_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_Absolute_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_Absolute_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_Absolute_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_Absolute_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_EC2_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_EC2_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_EC2_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_EC2_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_HF_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_HF_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_HF_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_HF_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_RelativeSample_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_RelativeSample_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_RelativeSample_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_RelativeSample_2017_2017
+    type: auto
+    eras: [2017]
+  - name: CMS_scale_j_BBEC1_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_BBEC1_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_BBEC1_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_BBEC1_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_Absolute_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_Absolute_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_Absolute_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_Absolute_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_EC2_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_EC2_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_EC2_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_EC2_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_HF_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_HF_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_HF_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_HF_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_RelativeSample_2016preVFP_2016
+    type: auto
+    eras: [2016]
+  - name: CMS_scale_j_BBEC1_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2018_20182016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2018_20182017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2018_20182018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2018_20182016_HIPM
+  - name: CMS_scale_j_BBEC1_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2018_20182016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2018_20182017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2018_20182018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2018_20182016_HIPM
+  - name: CMS_scale_j_BBEC1_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2018_20182016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2018_20182017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2018_20182018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2018_20182016_HIPM
+  - name: CMS_scale_j_BBEC1_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2018_20182016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2018_20182017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2018_20182018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2018_20182016_HIPM
+  - name: CMS_scale_j_Absolute_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2017_20172016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2017_20172017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2017_20172018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2017_20172016_HIPM
+  - name: CMS_scale_j_Absolute_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2017_20172016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2017_20172017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2017_20172018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2017_20172016_HIPM
+  - name: CMS_scale_j_Absolute_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2017_20172016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2017_20172017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2017_20172018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2017_20172016_HIPM
+  - name: CMS_scale_j_Absolute_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2017_20172016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2017_20172017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2017_20172018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2017_20172016_HIPM
+  - name: CMS_scale_j_EC2_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2017_20172016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2017_20172017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2017_20172018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2017_20172016_HIPM
+  - name: CMS_scale_j_EC2_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016preVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016preVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2016preVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2016preVFP_20162016_HIPM
+  - name: CMS_scale_j_EC2_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016preVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016preVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2016preVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2016preVFP_20162016_HIPM
+  - name: CMS_scale_j_EC2_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016preVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2016preVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2016preVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2016preVFP_20162016_HIPM
+  - name: CMS_scale_j_HF_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016preVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016preVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2016preVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2016preVFP_20162016_HIPM
+  - name: CMS_scale_j_HF_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2016preVFP_20162016_HIPM
+  - name: CMS_scale_j_HF_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_BBEC1_2016postVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_BBEC1_2016postVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_BBEC1_2016postVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_BBEC1_2016postVFP_20162016_HIPM
+  - name: CMS_scale_j_HF_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_Absolute_2016postVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_Absolute_2016postVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_Absolute_2016postVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_Absolute_2016postVFP_20162016_HIPM
+  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_EC2_2016postVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_EC2_2016postVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_EC2_2016postVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_EC2_2016postVFP_20162016_HIPM
+  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_HF_2016postVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_HF_2016postVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_HF_2016postVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_HF_2016postVFP_20162016_HIPM
+  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_20162016
-    type: auto
-    eras: [2016]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_20162017
-    type: auto
-    eras: [2017]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_20162018
-    type: auto
-    eras: [2018]
-  - name: CMS_scale_j_RelativeSample_2016postVFP_20162016_HIPM
+  - name: CMS_scale_j_RelativeSample_2016postVFP_2016
     type: auto
     eras: [2016_HIPM]
   - name: CMS_eff_e_id_2016
