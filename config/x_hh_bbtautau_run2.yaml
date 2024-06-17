@@ -753,13 +753,25 @@ uncertainties:
     - Run_2016_HIPM
   - name: CMS_eff_t_id_syst_highpT_bin1
     type: auto
-    eras: ["2016","2016_HIPM", "2017","2018"]
+    eras:
+    - Run2_2016
+    - Run2_2016_HIPM
+    - Run2_2017
+    - Run2_2018
   - name: CMS_eff_t_id_syst_highpT_bin2
     type: auto
-    eras: ["2016","2016_HIPM", "2017","2018"]
+    eras:
+    - Run2_2016
+    - Run2_2016_HIPM
+    - Run2_2017
+    - Run2_2018
   - name: CMS_eff_t_id_syst_highpT_extrap
     type: auto
-    eras: ["2016","2016_HIPM", "2017","2018"]
+    eras:
+    - Run2_2016
+    - Run2_2016_HIPM
+    - Run2_2017
+    - Run2_2018
   - name: CMS_l1_prefiring_2017
     type: auto
     eras:
