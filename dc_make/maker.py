@@ -11,6 +11,42 @@ from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
 from .model import Model
 ROOT = importROOT()
 
+def RenormalizeHistogram(histogram, norm, include_overflows=True):
+    integral = histogram.Integral(0, histogram.GetNbinsX()+1) if include_overflows else histogram.Integral()
+    if integral!=0:
+        histogram.Scale(norm / integral)
+
+def FixNegativeContributions(histogram):
+    correction_factor = 0.
+
+    ss_debug = ""
+    ss_negative = ""
+
+    original_Integral = histogram.Integral(0, histogram.GetNbinsX()+1)
+    ss_debug += "\nSubtracted hist for '{}'.\n".format(histogram.GetName())
+    ss_debug += "Integral after bkg subtraction: {}.\n".format(original_Integral)
+    if original_Integral < 0:
+        print(ss_debug)
+        print("Integral after bkg subtraction is negative for histogram '{}'".format(histogram.GetName()))
+        return False,ss_debug, ss_negative
+
+    for n in range(1, histogram.GetNbinsX()+1):
+        if histogram.GetBinContent(n) >= 0:
+            continue
+        prefix = "WARNING" if histogram.GetBinContent(n) + histogram.GetBinError(n) >= 0 else "ERROR"
+
+        ss_negative += "{}: {} Bin {}, content = {}, error = {}, bin limits=[{},{}].\n".format(
+            prefix, histogram.GetName(), n, histogram.GetBinContent(n), histogram.GetBinError(n),
+            histogram.GetBinLowEdge(n), histogram.GetBinLowEdge(n+1))
+
+        error = correction_factor - histogram.GetBinContent(n)
+        new_error = math.sqrt(math.pow(error, 2) + math.pow(histogram.GetBinError(n), 2))
+        histogram.SetBinContent(n, correction_factor)
+        histogram.SetBinError(n, new_error)
+
+    RenormalizeHistogram(histogram, original_Integral, True)
+    return True, ss_debug, ss_negative
+
 class DatacardMaker:
   def __init__(self, cfg_file, input_path, hist_bins=None):
     self.cb = CombineHarvester()
@@ -42,6 +78,7 @@ class DatacardMaker:
           raise RuntimeError(f"Process name {process.name} already exists")
         print(f"Adding {process}")
         self.processes[process.name] = process
+        #self.processes[process.name]['subprocess'] = [process.subprocesses]
         if process.is_data:
           if data_process is not None:
             raise RuntimeError("Multiple data processes defined")
@@ -59,6 +96,7 @@ class DatacardMaker:
 
     self.uncertainties = {}
     for unc_entry in cfg["uncertainties"]:
+      #print(unc_entry)
       unc = Uncertainty.fromConfig(unc_entry)
       if unc.name in self.uncertainties:
         raise RuntimeError(f"Uncertainty {unc.name} already exists")
@@ -113,8 +151,23 @@ class DatacardMaker:
       self.input_files[file_name] = file
     return self.input_files[file_name]
 
-  def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
+  def prepareHist(self,file,hist_name,unc_name,process):
+    hist = file.Get(hist_name)
+    if hist == None:
+      raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+    if self.hist_bins is not None:
+      new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(self.hist_bins) - 1, self.hist_bins.data())
+      rebinAndFill(new_hist, hist)
+      hist = new_hist
+    hist.SetDirectory(0)
+    if process.scale != 1:
+      hist.Scale(process.scale)
+    return hist
+
+  def getShape(self, process, era, channel, category, model_params,unc_name=None, unc_scale=None):
     key = (process.name, era, channel, category, unc_name, unc_scale)
+    if process.name == 'QCD' and category=='boosted':
+      process.allowNegativeContributions = True
     if key not in self.shapes:
       if process.is_data and (unc_name is not None or unc_scale is not None):
         raise RuntimeError("Cannot apply uncertainty to the data process")
@@ -132,25 +185,34 @@ class DatacardMaker:
       else:
         file = self.getInputFile(era, model_params)
         hist_name = f"{channel}/{category}/{process.hist_name}"
-        if unc_name is not None:
-          hist_name = f"{hist_name}_{unc_name}{unc_scale}"
-        hist = file.Get(hist_name)
-        if hist == None:
-          raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
-      if self.hist_bins is not None:
-        new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(self.hist_bins) - 1, self.hist_bins.data())
-        rebinAndFill(new_hist, hist)
-        hist = new_hist
-      hist.SetDirectory(0)
-      if process.scale != 1:
-        hist.Scale(process.scale)
-      if hasNegativeBins(hist):
-        axis = hist.GetXaxis()
-        bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
-        bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
-        print(f'bins_edges: [ {", ".join(bins_edges)} ]')
-        print(f'bin_values: [ {", ".join(bin_values)} ]')
-        raise RuntimeError(f"Negative bins found in histogram {hist_name}")
+        hists = []
+        objsToMerge = ROOT.TList()
+        print(process.subprocesses)
+        if process.subprocesses:
+          for subp in process.subprocesses:
+            hist_name = f"{channel}/{category}/{subp}"
+            hists.append(self.prepareHist(file,hist_name,unc_name,process))
+        else:
+          hists.append(self.prepareHist(file,hist_name,unc_name,process))
+        hist = hists[0]
+        if len(hists)>1:
+          for histy in hists:
+            objsToMerge.Add(histy)
+          hist.Merge(objsToMerge)
+        print(process.name)
+        hist.SetName(process.name)
+        hist.SetTitle(process.name)
+
+        if process.allowNegativeContributions == False:
+          fix_negative_contributions,debug_info,negative_bins_info = FixNegativeContributions(hist)
+
+        if hasNegativeBins(hist) and process.allowNegativeContributions == False:
+          axis = hist.GetXaxis()
+          bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
+          bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
+          print(f'bins_edges: [ {", ".join(bins_edges)} ]')
+          print(f'bin_values: [ {", ".join(bin_values)} ]')
+          raise RuntimeError(f"Negative bins found in histogram {hist_name}")
       self.shapes[key] = hist
     return self.shapes[key]
 
@@ -194,8 +256,11 @@ class DatacardMaker:
 
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
+    #print(unc_name)
+    #print(self.PPECC())
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
+      #print(processes)
       if process.is_data: continue
       if not unc.appliesTo(proc, era, channel, category): continue
       model_params = self.param_bins.get(param_str, None)
@@ -203,6 +268,7 @@ class DatacardMaker:
 
       nominal_shape = None
       shapes = {}
+      print(f"need shape? {unc.needShapes}")
       if unc.needShapes:
         model_params = self.param_bins.get(param_str, None)
         nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)

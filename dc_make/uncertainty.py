@@ -81,7 +81,7 @@ class Uncertainty:
       return v
 
     args = {}
-    for key in [ "processes", "eras", "channels", "categories" ]:
+    for key in [ "processes", "eras", "channels", "categories"]:
       args[key] = getPatternList(key)
 
     if unc_type == UncertaintyType.lnN:
@@ -90,6 +90,8 @@ class Uncertainty:
         value = float(value)
       elif type(value) == list and len(value) == 2:
         value = { UncertaintyScale.Down: value[0], UncertaintyScale.Up: value[1] }
+      elif type(value) == dict :
+        value = value
       else:
         raise RuntimeError("Invalid lnN uncertainty value")
 

@@ -1,8 +1,9 @@
 from ..common.param_parse import extractParameters, applyParameters, parameterListToDict
 
 class Process:
-  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None):
+  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, allowNegativeContributions=False,subprocesses=[]):
     self.name = name
+    #print(self.name)
     self.hist_name = hist_name
     self.is_signal = is_signal
     self.is_data = is_data
@@ -10,6 +11,9 @@ class Process:
     self.is_background = not (is_signal or is_data)
     self.scale=scale
     self.params = params
+    self.allowNegativeContributions = allowNegativeContributions
+    #print(self.params)
+    self.subprocesses = subprocesses
 
     if is_data and is_signal:
       raise RuntimeError("Data and signal flags cannot be set simultaneously")
@@ -24,7 +28,7 @@ class Process:
       self.type = "background"
 
   def __str__(self):
-    str_rep =  f"Process({self.name}, type={self.type}"
+    str_rep =  f"Process({self.name}, type={self.type}, subprocesses={self.subprocesses}"
     if self.is_signal:
       str_rep += f", params={self.params}"
     str_rep += ")"
@@ -44,6 +48,7 @@ class Process:
 
   @staticmethod
   def fromConfig(entry, model):
+    #print(entry)
     if type(entry) == str:
       return [ Process(entry, entry) ]
     if type(entry) != dict:
@@ -53,6 +58,8 @@ class Process:
     is_signal = entry.get("is_signal", False)
     is_data = entry.get("is_data", False)
     is_asimov_data = entry.get("is_asimov_data", False)
+    allowNegativeContributions = entry.get("allowNegativeContributions", False)
+    subprocesses = entry.get("subprocesses", [])
     scale = entry.get("scale", 1)
     if type(scale) == str:
       scale = eval(scale)
@@ -60,7 +67,7 @@ class Process:
       if is_signal and len(model.parameters) > 0:
         raise RuntimeError("Signal process must have parameter values")
       return [ Process(base_name, base_hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
-                       scale=scale) ]
+                       scale=scale,allowNegativeContributions=allowNegativeContributions,subprocesses=subprocesses) ]
 
     parameters = model.parameters if is_signal else extractParameters(base_name)
     param_values = entry["param_values"]
@@ -73,4 +80,5 @@ class Process:
       hist_name = applyParameters(base_hist_name, param_dict)
       processes.append(Process(name, hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
                                scale=scale, params=param_dict))
+    #print(processes)
     return processes
