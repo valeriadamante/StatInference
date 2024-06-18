@@ -60,6 +60,9 @@ class Uncertainty:
     if len(patterns) == 0:
       return True
     for pattern in patterns:
+      #print(f"value = {value}")
+      #print(pattern)
+      #print(value == pattern)
       if pattern[0] == '^':
         if re.match(pattern, value):
           return True

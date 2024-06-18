@@ -1,9 +1,8 @@
 from ..common.param_parse import extractParameters, applyParameters, parameterListToDict
 
 class Process:
-  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, allowNegativeContributions=False,subprocesses=[]):
+  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, allowNegativeContributions=False,subprocesses=[], isRelatedTo=None):
     self.name = name
-    #print(self.name)
     self.hist_name = hist_name
     self.is_signal = is_signal
     self.is_data = is_data
@@ -12,7 +11,7 @@ class Process:
     self.scale=scale
     self.params = params
     self.allowNegativeContributions = allowNegativeContributions
-    #print(self.params)
+    self.isRelatedTo = isRelatedTo
     self.subprocesses = subprocesses
 
     if is_data and is_signal:
@@ -48,7 +47,6 @@ class Process:
 
   @staticmethod
   def fromConfig(entry, model):
-    #print(entry)
     if type(entry) == str:
       return [ Process(entry, entry) ]
     if type(entry) != dict:
@@ -59,6 +57,7 @@ class Process:
     is_data = entry.get("is_data", False)
     is_asimov_data = entry.get("is_asimov_data", False)
     allowNegativeContributions = entry.get("allowNegativeContributions", False)
+    isRelatedTo = entry.get("isRelatedTo", False)
     subprocesses = entry.get("subprocesses", [])
     scale = entry.get("scale", 1)
     if type(scale) == str:
@@ -67,7 +66,7 @@ class Process:
       if is_signal and len(model.parameters) > 0:
         raise RuntimeError("Signal process must have parameter values")
       return [ Process(base_name, base_hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
-                       scale=scale,allowNegativeContributions=allowNegativeContributions,subprocesses=subprocesses) ]
+                       scale=scale,allowNegativeContributions=allowNegativeContributions,subprocesses=subprocesses, isRelatedTo=isRelatedTo) ]
 
     parameters = model.parameters if is_signal else extractParameters(base_name)
     param_values = entry["param_values"]
@@ -80,5 +79,4 @@ class Process:
       hist_name = applyParameters(base_hist_name, param_dict)
       processes.append(Process(name, hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
                                scale=scale, params=param_dict))
-    #print(processes)
     return processes

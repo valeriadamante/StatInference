@@ -5,7 +5,7 @@ import yaml
 
 from CombineHarvester.CombineTools.ch import CombineHarvester
 
-from StatInference.common.tools import hasNegativeBins, listToVector, rebinAndFill, importROOT
+from StatInference.common.tools import hasNegativeBins, listToVector, rebinAndFill, importROOT,hasRelevantNegativeBins
 from .process import Process
 from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
 from .model import Model
@@ -116,6 +116,8 @@ class DatacardMaker:
 
     self.input_files = {}
     self.shapes = {}
+    self.newshapes = {}
+    self.oldshapes = {}
 
   def getBin(self, era, channel, category, return_name=True, return_index=True):
     name = f'{era}_{self.analysis}_{channel}_{category}'
@@ -151,7 +153,7 @@ class DatacardMaker:
       self.input_files[file_name] = file
     return self.input_files[file_name]
 
-  def prepareHist(self,file,hist_name,unc_name,process):
+  def prepareHist(self,file,hist_name,process):
     hist = file.Get(hist_name)
     if hist == None:
       raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
@@ -166,6 +168,7 @@ class DatacardMaker:
 
   def getShape(self, process, era, channel, category, model_params,unc_name=None, unc_scale=None):
     key = (process.name, era, channel, category, unc_name, unc_scale)
+    print(f"getting shape for {unc_name}")
     if process.name == 'QCD' and category=='boosted':
       process.allowNegativeContributions = True
     if key not in self.shapes:
@@ -186,25 +189,24 @@ class DatacardMaker:
         file = self.getInputFile(era, model_params)
         hist_name = f"{channel}/{category}/{process.hist_name}"
         hists = []
-        objsToMerge = ROOT.TList()
-        print(process.subprocesses)
         if process.subprocesses:
           for subp in process.subprocesses:
             hist_name = f"{channel}/{category}/{subp}"
-            hists.append(self.prepareHist(file,hist_name,unc_name,process))
+            if unc_name and unc_scale:
+              hist_name += f"_{unc_name}{unc_scale}"
+            hists.append(self.prepareHist(file,hist_name,process))
         else:
-          hists.append(self.prepareHist(file,hist_name,unc_name,process))
+          hists.append(self.prepareHist(file,hist_name,process))
         hist = hists[0]
         if len(hists)>1:
+          objsToMerge = ROOT.TList()
           for histy in hists:
             objsToMerge.Add(histy)
           hist.Merge(objsToMerge)
-        print(process.name)
         hist.SetName(process.name)
         hist.SetTitle(process.name)
-
-        if process.allowNegativeContributions == False:
-          fix_negative_contributions,debug_info,negative_bins_info = FixNegativeContributions(hist)
+        if hasRelevantNegativeBins(hist, self.getRelevantBins(era, channel, category,unc_name, unc_scale=None)):# and process.allowNegativeContributions == False:
+          raise RuntimeError(f"there are relevant negative bins in histogram {hist_name}")
 
         if hasNegativeBins(hist) and process.allowNegativeContributions == False:
           axis = hist.GetXaxis()
@@ -213,9 +215,33 @@ class DatacardMaker:
           print(f'bins_edges: [ {", ".join(bins_edges)} ]')
           print(f'bin_values: [ {", ".join(bin_values)} ]')
           raise RuntimeError(f"Negative bins found in histogram {hist_name}")
+        if process.allowNegativeContributions == False:
+          fix_negative_contributions,debug_info,negative_bins_info = FixNegativeContributions(hist)
+
       self.shapes[key] = hist
     return self.shapes[key]
 
+  def getRelevantBins(self, era, channel, category,unc_name=None, unc_scale=None):
+    relevant_bins = []
+    for signal_proc in self.processes.values():
+      if signal_proc.is_signal:
+        model_params = signal_proc.params
+        #param_str = self.model.paramStr(model_params)
+        file = self.getInputFile(era, model_params)
+        hist_name = f"{channel}/{category}/{signal_proc.hist_name}"
+        hist = self.prepareHist(file,hist_name,signal_proc)
+        axis = hist.GetXaxis()
+        hist_integral = hist.Integral(1,axis.GetNbins() + 1)
+        for nbin in range(1,axis.GetNbins() + 1):
+          isImportant=False
+          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= 0.2:
+            isImportant = True
+
+          if len(relevant_bins) < axis.GetNbins():
+            relevant_bins.append(isImportant)
+          else:
+            relevant_bins[nbin-1] = isImportant
+    return relevant_bins
 
   def addProcess(self, proc, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
@@ -256,19 +282,16 @@ class DatacardMaker:
 
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
-    #print(unc_name)
-    #print(self.PPECC())
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
-      #print(processes)
       if process.is_data: continue
-      if not unc.appliesTo(proc, era, channel, category): continue
+      if not unc.appliesTo(process.name, era, channel, category): continue
       model_params = self.param_bins.get(param_str, None)
       if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
       nominal_shape = None
       shapes = {}
-      print(f"need shape? {unc.needShapes}")
+      #print(f"need shape? {unc.needShapes}")
       if unc.needShapes:
         model_params = self.param_bins.get(param_str, None)
         nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
@@ -307,13 +330,44 @@ class DatacardMaker:
       shape_file = os.path.join(output, f"{proc_name}.root")
       self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
 
+  def MergeProcesses(self):
+    hists_to_merge = {}
+    self.oldshapes = self.shapes
+    for key in self.oldshapes.keys():
+      (proc, era, channel, category, unc_name, unc_scale) = key
+      if self.processes[proc].isRelatedTo:
+        new_key = (self.processes[proc].isRelatedTo, era, channel, category, unc_name, unc_scale)
+        if new_key not in hists_to_merge.keys():
+          hists_to_merge[new_key] = []
+        hists_to_merge[new_key].append(self.oldshapes[key])
+      else:
+        if key not in hists_to_merge.keys():
+          hists_to_merge[key] = []
+        hists_to_merge[key].append(self.oldshapes[key])
+    for keyhist,histlist in hists_to_merge.items():
+      hist = histlist[0]
+      if len(histlist)>1:
+        objsToMerge = ROOT.TList()
+        for histy in histlist:
+          objsToMerge.Add(histy)
+        hist.Merge(objsToMerge)
+      (processname, era, channel, category, unc_name, unc_scale) = keyhist
+      hist.SetName(processname)
+      hist.SetTitle(processname)
+      self.newshapes[keyhist] = hist
+
+
   def createDatacards(self, output, verbose=1):
     try:
       for era, channel, category in self.ECC():
         for process_name in self.processes.keys():
           self.addProcess(process_name, era, channel, category)
       for unc_name in self.uncertainties.keys():
+        print(f"adding uncertainty: {unc_name}")
         self.addUncertainty(unc_name)
+      self.MergeProcesses()
+      self.shapes = self.newshapes
+      print(self.shapes)
       if self.autoMCStats["apply"]:
         self.cb.SetAutoMCStats(self.cb, self.autoMCStats["threshold"], self.autoMCStats["apply_to_signal"],
                                self.autoMCStats["mode"])
