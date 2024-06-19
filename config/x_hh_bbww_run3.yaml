@@ -4,9 +4,9 @@ model:
   parameters: [ MX ]
   param_dependent_bkg: true
   input_file_pattern: ${ERA}/shape_m${MX}.root
-#hist_bins: [ 0, 0.7, 1 ]
+hist_bins: [ 0, 0.7, 1 ]
 eras:
-  - Run3_2022EE
+  - Run3_2022
 channels:
   - ee
   - emu
@@ -38,6 +38,10 @@ uncertainties:
   - name: muID
     type: auto
   - name: pu
+    type: auto
+  - name: jer
+    type: auto
+  - name: jes
     type: auto
 autolnNThr: 0.1
 asymlnNThr: 0.001
