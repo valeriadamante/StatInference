@@ -1,6 +1,7 @@
 import itertools
 import math
 import os
+import numpy as np
 import yaml
 
 from CombineHarvester.CombineTools.ch import CombineHarvester
@@ -16,36 +17,102 @@ def RenormalizeHistogram(histogram, norm, include_overflows=True):
     if integral!=0:
         histogram.Scale(norm / integral)
 
-def FixNegativeContributions(histogram):
-    correction_factor = 0.
+def th1ToNumpy(histogram, include_overflow=False):
+    bin_range = (0, histogram.GetNbinsX() + 1) if include_overflow else (1, histogram.GetNbinsX())
+    n_bins = bin_range[1] - bin_range[0] + 1
+    bin_contents = np.zeros(n_bins)
+    bin_errors = np.zeros(n_bins)
+    bin_numbers = np.zeros(n_bins, dtype=int)
+    bin_indices = {}
+    for bin_idx, bin_number in enumerate(range(bin_range[0], bin_range[1] + 1)):
+        bin_contents[bin_idx] = histogram.GetBinContent(bin_number)
+        bin_errors[bin_idx] = histogram.GetBinError(bin_number)
+        bin_numbers[bin_idx] = bin_number
+        bin_indices[bin_number] = bin_idx
+    return bin_indices, bin_numbers, bin_contents, bin_errors
 
-    ss_debug = ""
-    ss_negative = ""
+class NegativeBinSolution:
+    def __init__(self):
+        self.accepted = True
+        self.integral = None
+        self.has_zero_integral = False
+        self.has_negative_integral = False
+        self.negative_bins = set()
+        self.negative_bins_within_error = set()
+        self.relevant_negative_bins = set()
+        self.changed_bins = set()
 
-    original_Integral = histogram.Integral(0, histogram.GetNbinsX()+1)
-    ss_debug += "\nSubtracted hist for '{}'.\n".format(histogram.GetName())
-    ss_debug += "Integral after bkg subtraction: {}.\n".format(original_Integral)
-    if original_Integral < 0:
-        print(ss_debug)
-        print("Integral after bkg subtraction is negative for histogram '{}'".format(histogram.GetName()))
-        return False,ss_debug, ss_negative
+def resolveNegativeBins(histogram, allow_zero_integral=False, allow_negative_integral=False,
+                        allow_negative_bins_within_error=False, max_n_sigma_for_negative_bins=1,
+                        relevant_bins=None, include_overflow=False):
+    relevant_bins = relevant_bins or []
+    bin_indices, bin_numbers, bin_contents, bin_errors = th1ToNumpy(histogram, include_overflow)
+    n_bins = len(bin_numbers)
 
-    for n in range(1, histogram.GetNbinsX()+1):
-        if histogram.GetBinContent(n) >= 0:
+    solution = NegativeBinSolution()
+    solution.integral = np.sum(bin_contents)
+    if solution.integral == 0:
+        solution.has_zero_integral = True
+        solution.accepted = allow_zero_integral
+        return solution
+    if solution.integral < 0:
+        solution.has_negative_integral = True
+        solution.accepted = allow_negative_integral
+        return solution
+
+    donor_integral = 0.
+    negative_integral = 0.
+
+    for bin_idx in range(n_bins):
+        if bin_contents[bin_idx] >= 0:
+            if bin_numbers[bin_idx] not in relevant_bins:
+                donor_integral += bin_contents[bin_idx]
             continue
-        prefix = "WARNING" if histogram.GetBinContent(n) + histogram.GetBinError(n) >= 0 else "ERROR"
+        negative_integral += bin_contents[bin_idx]
+        solution.negative_bins.add(bin_numbers[bin_idx])
+        print(bin_idx, bin_numbers[bin_idx])
+        zero_within_error = bin_contents[bin_idx] + max_n_sigma_for_negative_bins * bin_errors[bin_idx] >= 0
+        if zero_within_error:
+            solution.negative_bins_within_error.add(bin_numbers[bin_idx])
+        if not allow_negative_bins_within_error or not zero_within_error:
+            solution.accepted = False
+        if bin_numbers[bin_idx] in relevant_bins:
+            solution.relevant_negative_bins.add(bin_numbers[bin_idx])
+            solution.accepted = False
 
-        ss_negative += "{}: {} Bin {}, content = {}, error = {}, bin limits=[{},{}].\n".format(
-            prefix, histogram.GetName(), n, histogram.GetBinContent(n), histogram.GetBinError(n),
-            histogram.GetBinLowEdge(n), histogram.GetBinLowEdge(n+1))
+    if abs(negative_integral) > donor_integral:
+        solution.accepted = False
 
-        error = correction_factor - histogram.GetBinContent(n)
-        new_error = math.sqrt(math.pow(error, 2) + math.pow(histogram.GetBinError(n), 2))
-        histogram.SetBinContent(n, correction_factor)
-        histogram.SetBinError(n, new_error)
+    if not solution.accepted or len(solution.negative_bins) == 0:
+        return solution
 
-    RenormalizeHistogram(histogram, original_Integral, True)
-    return True, ss_debug, ss_negative
+    for bin_number in solution.negative_bins:
+        bin_idx = bin_indices[bin_number]
+        donor_bin_indices = []
+        for i in range(n_bins):
+            if i != bin_idx and bin_numbers[i] not in relevant_bins and bin_contents[i] > 0:
+                donor_bin_indices.append(i)
+        donor_bin_indices = sorted(donor_bin_indices, key=lambda i: abs(i-bin_idx))
+        to_balance = -bin_contents[bin_idx]
+        bin_errors[bin_idx] = math.sqrt(bin_contents[bin_idx] ** 2 + bin_errors[bin_idx] ** 2)
+        bin_contents[bin_idx] = 0
+        solution.changed_bins.add(bin_number)
+        for donor_bin_idx in donor_bin_indices:
+            donor_contribution = min(to_balance, bin_contents[donor_bin_idx])
+            if donor_contribution <= 0: continue
+            bin_errors[donor_bin_idx] = math.sqrt(donor_contribution ** 2 + bin_errors[donor_bin_idx] ** 2)
+            bin_contents[donor_bin_idx] -= donor_contribution
+            solution.changed_bins.add(bin_numbers[donor_bin_idx])
+            to_balance -= donor_contribution
+            if to_balance <= 0: break
+        if to_balance > 0: # this should not happen, because we checked that negative_integral <= donor_integral
+            raise RuntimeError(f"resolveNegativeBins: failed to balance bin {bin_number}")
+    for bin_number in solution.changed_bins:
+        bin_idx = bin_indices[bin_number]
+        histogram.SetBinContent(bin_number, bin_contents[bin_idx])
+        histogram.SetBinError(bin_number, bin_errors[bin_idx])
+
+    return solution
 
 class DatacardMaker:
   def __init__(self, cfg_file, input_path, hist_bins=None):
@@ -208,15 +275,17 @@ class DatacardMaker:
         if hasRelevantNegativeBins(hist, self.getRelevantBins(era, channel, category,unc_name, unc_scale=None)):# and process.allowNegativeContributions == False:
           raise RuntimeError(f"there are relevant negative bins in histogram {hist_name}")
 
-        if hasNegativeBins(hist) and process.allowNegativeContributions == False:
+        solution = resolveNegativeBins(hist,allow_negative_bins_within_error=False)
+
+        if not solution.accepted and process.allowNegativeContributions == False:
           axis = hist.GetXaxis()
           bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
           bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
           print(f'bins_edges: [ {", ".join(bins_edges)} ]')
           print(f'bin_values: [ {", ".join(bin_values)} ]')
           raise RuntimeError(f"Negative bins found in histogram {hist_name}")
-        if process.allowNegativeContributions == False:
-          fix_negative_contributions,debug_info,negative_bins_info = FixNegativeContributions(hist)
+        #if process.allowNegativeContributions == False:
+          #fix_negative_contributions,debug_info,negative_bins_info = FixNegativeContributions(hist)
 
       self.shapes[key] = hist
     return self.shapes[key]
@@ -285,7 +354,9 @@ class DatacardMaker:
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
       if process.is_data: continue
-      if not unc.appliesTo(process.name, era, channel, category): continue
+      #print(unc_name)
+      if not unc.appliesTo(process, era, channel, category): continue
+      #print(f"{unc_name} applied")
       model_params = self.param_bins.get(param_str, None)
       if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
@@ -365,9 +436,9 @@ class DatacardMaker:
       for unc_name in self.uncertainties.keys():
         print(f"adding uncertainty: {unc_name}")
         self.addUncertainty(unc_name)
-      self.MergeProcesses()
-      self.shapes = self.newshapes
-      print(self.shapes)
+      #self.MergeProcesses()
+      #self.shapes = self.newshapes
+      #print(self.shapes)
       if self.autoMCStats["apply"]:
         self.cb.SetAutoMCStats(self.cb, self.autoMCStats["threshold"], self.autoMCStats["apply_to_signal"],
                                self.autoMCStats["mode"])
