@@ -1,108 +1,204 @@
-import ROOT
 import numpy as np
 import os
+import uproot
+import json
+import sys
+import matplotlib.pyplot as plt
 
-input_name = "ggRadion_HH_bbWW_M_300.root"
-#input_name = "/eos/user/d/daebi/shape_files_15Apr2022/shape_m300.root"
-#input_name = "shape_m300.root"
-input_file = ROOT.TFile.Open(input_name)
+def integrate_uproot(hist, start, end):
+    int_values = np.sum(hist.values()[start:end+1])
+    int_errors = np.sum(hist.errors()[start:end+1])
+    return [int_values, int_errors]
 
-channel_names = [key.GetName() for key in input_file.GetListOfKeys()]
-
-
-
-for channel_name in channel_names:
-    print("At channel ", channel_name)
-
-    hist_dict = {}
-    hist_dict['total'] = ROOT.TH1D('total', 'total', 1000, 0.0, 1.0)
-    subdir = input_file.Get(channel_name)
-    process_names = [key.GetName() for key in subdir.GetListOfKeys()]
-
-    for process_name in process_names:
-        if process_name == 'data_obs': continue
-        #print("Looking at Channel ", channel_name, " and process ", process_name)
-        process_hist = subdir.Get(process_name)
-
-        x = np.zeros(process_hist.GetNbinsX())
-        x_err2 = np.zeros(process_hist.GetNbinsX())
-        for binnum in range(process_hist.GetNbinsX()):
-            x[binnum] = process_hist.GetBinContent(binnum + 1)
-            x_err2[binnum] = process_hist.GetBinError(binnum + 1)**2
-
-        #print("x vals = ", x)
-        #print("err vals = ", x_err2)
-
-        hist_dict[process_name] = process_hist
-        #print("Process ", process_name, ' has bins ', process_hist.GetNbinsX())
-        hist_dict['total'].Add(process_hist)
-
+def convert_to_json(bins_dict, params):
+    json_dict = []
+    for key in bins_dict.keys():
+        ch = key.split("_")[0]
+        cat = key.split("_")[1]
+        exists = False
+        #for entry in json_dict:
+        #    if entry['bins'] == bins_dict[key]:
+        #        entry['channels'].append(ch)
+        #        entry['categories'].append(cat)
+        #        exists = True
+        if not exists:
+            entry = {
+                    'bins': bins_dict[key],
+                    'channels': [ch],
+                    'categories': [cat],
+                }
+            for key, value in params.items():
+                entry[key] = [ value ]
+            json_dict.append(entry)
+                
+            
+    print(json_dict)
+    return json_dict
 
 
-    tmp_signal = hist_dict['ggRadion_HH_bbWW_M_300'].Integral()
-    nbins = 4
 
-    bin_content_goal = tmp_signal/nbins
+#This will need to loop over files too
+def optimize_binning(filename, params, sig_string, mass_list):
+    file = uproot.open(filename)
 
-    print("Channel ", channel_name, " has a total of ", tmp_signal, " entries, so the per-bin goal is ", bin_content_goal)
+    limit_history = {}
+    limit_list = []
 
-    custom_binning = [1.0]
-    custom_totals = []
-    done = False
-    start = hist_dict['ggRadion_HH_bbWW_M_300'].GetNbinsX()+1
-    while not done:
-        #for bincount in range(start, hist_dict['ggRadion_HH_bbWW_M_300'].GetNbinsX()+1):
-        for bincount in range(start, -1, -1):
-            if hist_dict['ggRadion_HH_bbWW_M_300'].Integral(bincount, start) >= bin_content_goal:
-                custom_binning.append(hist_dict['ggRadion_HH_bbWW_M_300'].GetXaxis().GetBinLowEdge(bincount))
-                custom_totals.append(hist_dict['ggRadion_HH_bbWW_M_300'].Integral(bincount, start))
-                print("At bin ", bincount, " integral is ", hist_dict['ggRadion_HH_bbWW_M_300'].Integral(bincount, start))
-                start = bincount-1
+    best_limit = np.inf
+    best_bins = None
+
+    nBinsMax = 20
+
+    bkg_names = ['TT', 'DY', 'ST', 'VV']
+
+    priority_list = []
+    bins_dict = {}
+    for cat in [ "res2b", "boost", "res1b" ]:
+        for ch in [ "mumu", "emu", "ee" ]:
+            priority_list.append((ch, cat))
+            dict_key = f'{ch}_{cat}'
+            bins_dict[dict_key] = [0.0, 1.0]
+            limit_history[dict_key] = {'nBins': [], 'limits': []}
+
+    for ch, cat in priority_list:
+        ch_cat = f'{ch}/{cat}/'
+        dict_key = f'{ch}_{cat}'
+        hist_names = [ key.split(';')[0][len(ch_cat):] for key in file.keys() if key.startswith(ch_cat) ]
+        hists = { hist_name : file[ch_cat+hist_name] for hist_name in hist_names }
+
+        print(f"Starting ch cat {ch_cat}")
+        
+        #signal_name = 'ggRadion_HH_bbWW_M300' #Update to get from yaml later
+        signal_name = sig_string
+        #important_backgrounds = ['TT', 'DY', 'ST']
+        important_backgrounds = ['TT']
+
+
+        tmp_signal = np.sum(hists[signal_name].values())
+
+        #Start the loop over nBins from 1 to nBinsMax
+        for nbins in range(1, nBinsMax):
+            bin_content_goal = tmp_signal/nbins
+
+            print(f"Channel {ch_cat} has a total of {tmp_signal} entries, so with {nbins} bins our per-bin goal is {bin_content_goal}")
+
+            custom_binning = [1.0]
+            custom_totals = []
+            done = False
+            nBins = len(hists[signal_name].values())-1
+            right_edge = nBins
+            big_bin_counter = 1
+            while not done:
+                for left_edge in range(right_edge, -1, -1):
+                    tot_integral_signal = integrate_uproot(hists[signal_name], left_edge, nBins)[0]
+                    curr_integral_signal = integrate_uproot(hists[signal_name], left_edge, right_edge)[0]
+                    integral_bkgs = np.zeros(len(important_backgrounds))
+                    integral_bkgs_unc = np.zeros(len(important_backgrounds))
+                    for i, bkg_name in enumerate(important_backgrounds):
+                        int_bkg = integrate_uproot(hists[bkg_name], left_edge, right_edge)
+                        integral_bkgs[i] = int_bkg[0]
+                        integral_bkgs_unc[i] = int_bkg[1]
+
+
+                    if left_edge ==  0:
+                        custom_binning.append(left_edge)
+                        custom_totals.append(curr_integral_signal)
+                        done = True
+                        break
+
+                    if (tot_integral_signal >= big_bin_counter*bin_content_goal):
+                        print(f"Check out the background unc/tot {integral_bkgs_unc/integral_bkgs}")
+                        print(f"Check the backgrounds for empty bins")
+                        for bkg_name in bkg_names:
+                            print(f"{bkg_name} has {integrate_uproot(hists[bkg_name], left_edge, right_edge)[0]} entries")
+
+
+                    if (tot_integral_signal >= big_bin_counter*bin_content_goal) and (np.max(integral_bkgs_unc/integral_bkgs) <= 0.2):                            
+                        custom_binning.append(round(hists[signal_name].axis().edges()[left_edge], 2))
+                        custom_totals.append(curr_integral_signal)
+                        print("At bin ", left_edge, " integral is ", custom_totals[-1])
+                        right_edge = left_edge-1
+                        big_bin_counter+=1
+                        break
+
+            print("Found the bin edge set, it is ", custom_binning)
+            print("With totals per bin as ", custom_totals)
+
+            if custom_totals[-1] < 0.2*bin_content_goal:
+                print("Final bin was very very small, auto merged!")
+                del custom_binning[-2]
+                print("New binning is ", custom_binning)
+
+            custom_binning.sort()
+            bins_dict[dict_key] = custom_binning
+
+            print("Final dict binnings are ", bins_dict)
+
+
+
+            json_dict = convert_to_json(bins_dict, params)
+
+            with open(f'tmp_binning_{sig_string}.json', 'w') as f:
+                json.dump(json_dict, f)
+
+
+            #Create the datacards
+            ps_call(f"python3 ../dc_make/create_datacards.py --input /eos/user/d/daebi/bbWW_shape_files --output tmp_datacards_{sig_string} --config ../config/x_hh_bbww_run3.yaml --hist-bins ./tmp_binning_{sig_string}.json --param_values {mass_list}", shell=True)
+            #Find out where the limits will be saved
+            output = ps_call(f"law run MergeResonantLimits --version dev --datacards 'tmp_datacards_{sig_string}/*.txt' --print-output 0,False", shell=True, catch_stdout=True, split="\n")[1]
+            limit_file_name = output[-2]
+            #Run the limit calculation
+            ps_call(f"law run MergeResonantLimits --version dev --datacards 'tmp_datacards_{sig_string}/*.txt' --remove-output 3,a,y", shell=True)
+
+            #Now load the output numpy array and get value [1] (mass, val, up1, down1, up2, down2)
+            print(np.load(limit_file_name).files)
+            data = np.load(limit_file_name)
+            exp_limit = data[data.files[0]][0][1]
+
+            limit_history[dict_key]['nBins'].append(nbins)
+            limit_history[dict_key]['limits'].append(exp_limit)
+            limit_list.append(exp_limit)
+
+            #If adding a bin does not improve (limit stays the same) then just move on
+            if (exp_limit < best_limit) or (nbins == 1):
+                best_limit = exp_limit
+                best_bins = bins_dict.copy()
+
+            else:
+                print(f"Did not improve limits at nbins {nbins}, best limit was {best_limit}, and current was {exp_limit}")
+                #Need to replace the bin dict because it now has the 'worse' new binning
+                bins_dict = best_bins.copy()
                 break
-            if bincount ==  0:
-                custom_binning.append(bincount)
-                custom_totals.append(hist_dict['ggRadion_HH_bbWW_M_300'].Integral(bincount, start))
-                done = True
-    print("Found the bin edge set, it is ", custom_binning)
-    print("With totals per bin as ", custom_totals)
-
-    custom_binning.sort()
 
 
-    #Now create a new yaml for just this channel and save it somewhere
-    yaml_example = "../config/x_hh_bbww_run3.yaml"
-    if not os.path.exists("tmp_yamls/"):
-        os.makedirs("tmp_yamls/")
-    yaml_name = channel_name
-    new_yaml = open("tmp_yamls/"+yaml_name+".yaml", 'w')
-    old_yaml = open(yaml_example, 'r')
 
-    for line in old_yaml:
-        if 'ee' in line:
-            if 'ee' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'emu' in line:
-            if 'emu' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'mumu' in line:
-            if 'mumu' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'res1b' in line:
-            if 'res1b' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'res2b' in line:
-            if 'res2b' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'boost' in line:
-            if 'boost' in channel_name.split('_'):
-                new_yaml.write(line)
-        elif 'hist_bins:' in line:
-            new_yaml.write("hist_bins: {custom_binning}\n".format(custom_binning = custom_binning))
-        else:
-            new_yaml.write(line)
-    print("Created new yaml"+yaml_name)
 
-    #if not os.path.exists("tmp_datacards/"):
-    #    os.makedirs("tmp_datacards/")
 
-    #os.system("cmbEnv python3 StatInference/dc_make/create_datacards.py --input /eos/user/d/daebi/bbWW_shape_files --output StatInference/bin_opt/tmp_shapes --config StatInference/bin_opt/tmp_datacards/Run3_2022_hh_bbww_mumu_res2b.yaml")
+    print("Finished the limit scan, lets look at the history")
+    print(limit_history)
+
+    print(limit_list)
+    plt.plot(limit_list)
+    #plt.show()
+    plt.yscale('log')
+    plt.savefig(f"binopt_history_{sig_string}.pdf")
+    plt.close()
+
+
+
+
+if __name__ == '__main__':
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        pkg_dir = os.path.dirname(file_dir)
+        base_dir = os.path.dirname(pkg_dir)
+        pkg_dir_name = os.path.split(pkg_dir)[1]
+        if base_dir not in sys.path:
+            sys.path.append(base_dir)
+        __package__ = pkg_dir_name
+
+        from RunKit.run_tools import ps_call
+
+        shapes_dir = "/eos/user/d/daebi/bbWW_shape_files/Run3_2022/"
+
+        for mass in [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]:
+            optimize_binning(shapes_dir+f"shape_m{mass}.root", {'MX': mass}, f'ggRadion_HH_bbWW_M{mass}', mass)
