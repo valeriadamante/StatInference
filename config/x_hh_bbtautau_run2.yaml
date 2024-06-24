@@ -4,6 +4,7 @@ model:
   parameters: [ MX ]
   param_dependent_bkg: false
   input_file_pattern: ${ERA}.root
+hist_bins: [245, 350, 450,600,750,1250,3500]
 eras:
   - Run_2018
   #- Run_2017
@@ -117,8 +118,6 @@ processes:
     allowNegativeContributions: True
     subprocesses:
     - GluGluHToTauTau_M125
-    - HWplusJ_HToWW_M125
-    - HWminusJ_HToWW_M125
     isRelatedTo: VH
   - process: qqH_htt
     allowNegativeContributions: True
@@ -128,8 +127,16 @@ processes:
   - process: VH
     allowNegativeContributions: True
     subprocesses:
-    - ggHToZZTo2L2Q
+      - ggHToZZTo2L2Q
+      - GluGluHToWWTo2L2Nu_M125
+      - VBFHToWWTo2L2Nu_M125
+
+  - process: VH
+    allowNegativeContributions: True
+    subprocesses:
     - HZJ_HToWW_M125
+    - HWplusJ_HToWW_M125
+    - HWminusJ_HToWW_M125
     - GluGluZH_HToWW_ZTo2L_M125
     - ZH_Hbb_Zll
     - ZH_Hbb_Zqq

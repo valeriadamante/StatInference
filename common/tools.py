@@ -96,7 +96,7 @@ def hasRelevantNegativeBins(histogram, relevant_bins = []):
   for n in range(1, histogram.GetNbinsX() + 1):
     if histogram.GetBinContent(n) < 0 and len(relevant_bins)>0 and relevant_bins[n] == True :
       print(f"bin {n} is relevant for signals and has negative content")
-      return Trueßßß
+      return True
   return False
 
 def hasNegativeBins(histogram):
