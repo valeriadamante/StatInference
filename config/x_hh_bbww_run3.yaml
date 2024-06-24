@@ -8,13 +8,13 @@ hist_bins: [ 0, 0.7, 1 ]
 eras:
   - Run3_2022
 channels:
-  - ee
-  - emu
   - mumu
+  - emu
+  - ee
 categories:
-  - res1b
   - res2b
   - boost
+  - res1b
 processes:
   - process: data_obs
     is_data: true
