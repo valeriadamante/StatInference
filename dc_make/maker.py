@@ -9,10 +9,11 @@ from StatInference.common.tools import hasNegativeBins, listToVector, rebinAndFi
 from .process import Process
 from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
 from .model import Model
+from .binner import Binner
 ROOT = importROOT()
 
 class DatacardMaker:
-  def __init__(self, cfg_file, input_path, hist_bins=None):
+  def __init__(self, cfg_file, input_path, hist_bins=None, param_values=None):
     self.cb = CombineHarvester()
 
     self.input_path = input_path
@@ -36,6 +37,10 @@ class DatacardMaker:
     data_process = None
     has_signal = False
     for process in cfg["processes"]:
+      if (type(process) != str) and process.get('is_signal', False):
+        if param_values is not None:
+          print(f"Overwriting signal masses to {param_values}")
+          process['param_values'] = param_values
       new_processes = Process.fromConfig(process, self.model)
       for process in new_processes:
         if process.name in self.processes:
@@ -70,11 +75,19 @@ class DatacardMaker:
 
     self.autoMCStats = cfg.get("autoMCStats", { 'apply': False })
 
+
+    hist_bins = hist_bins or cfg.get("hist_bins", None)
+    self.hist_binner = Binner(hist_bins)
+
+
+
+    """
     self.hist_bins = hist_bins
     if self.hist_bins is None:
       self.hist_bins = cfg.get("hist_bins", None)
     if self.hist_bins is not None:
       self.hist_bins = listToVector(self.hist_bins, 'double')
+    """
 
     self.input_files = {}
     self.shapes = {}
@@ -137,10 +150,14 @@ class DatacardMaker:
         hist = file.Get(hist_name)
         if hist == None:
           raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+      """
       if self.hist_bins is not None:
         new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(self.hist_bins) - 1, self.hist_bins.data())
         rebinAndFill(new_hist, hist)
         hist = new_hist
+      """
+      hist = self.hist_binner.applyBinning(era, channel, category, model_params, hist)
+      
       hist.SetDirectory(0)
       if process.scale != 1:
         hist.Scale(process.scale)
