@@ -14,7 +14,7 @@ class Binner:
                'bins': hist_bins
             })           
         elif hist_bins is not None:
-            raise RuntimeError("Uncompatible format, you big dummy")
+            raise RuntimeError("Incompatible hist_bins format")
         for entry in self.hist_bins:
            entry['bins'] = listToVector(entry['bins'], 'double')
 
