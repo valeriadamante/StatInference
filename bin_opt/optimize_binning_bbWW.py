@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def integrate_uproot(hist, start, end):
     int_values = np.sum(hist.values()[start:end+1])
-    int_errors = np.sum((hist.errors()[start:end+1])**(2.0))
+    int_errors = np.sqrt(np.sum((hist.errors()[start:end+1])**(2.0)))
     return [int_values, int_errors]
 
 def convert_to_json(bins_dict, params):
@@ -100,12 +100,12 @@ def optimize_binning(filename, params, sig_string, mass_list):
                         int_bkg = integrate_uproot(hists[bkg_name], left_edge, right_edge)
                         if bkg_name == 'TT': #Only use TT for the later error check for now
                             integral_bkgs[i] = int_bkg[0]
-                            integral_bkgs_unc[i] = (int_bkg[1])**(0.5)
+                            integral_bkgs_unc[i] = (int_bkg[1])
 
                         tot_bkgs += int_bkg[i]
-                        tot_bkgs_unc += integral_bkgs_unc[i]
+                        tot_bkgs_unc += (integral_bkgs_unc[i]**(2.0))
 
-                    tot_bkgs_unc = tot_bkgs_unc**(0.5)
+                    tot_bkgs_unc = np.sqrt(tot_bkgs_unc)
 
 
                     if left_edge ==  0:
