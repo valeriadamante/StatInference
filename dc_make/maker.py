@@ -124,10 +124,11 @@ class DatacardMaker:
       if file == None:
         raise RuntimeError(f"Cannot open file {full_file_name}")
       self.input_files[file_name] = file
-    return self.input_files[file_name]
+    return file_name, self.input_files[file_name]
 
   def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
-    key = (process.name, era, channel, category, unc_name, unc_scale)
+    file_name, file = self.getInputFile(era, model_params)
+    key = (file_name, process.name, era, channel, category, unc_name, unc_scale)
     if key not in self.shapes:
       if process.is_data and (unc_name is not None or unc_scale is not None):
         raise RuntimeError("Cannot apply uncertainty to the data process")
@@ -143,7 +144,7 @@ class DatacardMaker:
         if hist is None:
           raise RuntimeError("Cannot create asimov data histogram")
       else:
-        file = self.getInputFile(era, model_params)
+        
         hist_name = f"{channel}/{category}/{process.hist_name}"
         if unc_name is not None:
           hist_name = f"{hist_name}_{unc_name}{unc_scale}"
@@ -182,6 +183,7 @@ class DatacardMaker:
         self.cb.AddObservations([param_str], [self.analysis], [era], [channel], [(bin_idx, bin_name)])
       else:
         self.cb.AddProcesses([param_str], [self.analysis], [era], [channel], [proc], [(bin_idx, bin_name)], process.is_signal)
+
       shape = self.getShape(process, era, channel, category, model_params)
       shape_set = False
       def setShape(p):
@@ -258,6 +260,8 @@ class DatacardMaker:
       dc_file = os.path.join(output, f"datacard_{proc_name}.txt")
       shape_file = os.path.join(output, f"{proc_name}.root")
       self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
+
+      #Want to add some subdirectories with cards that do only specific channels/categories/eras for debugging
 
   def createDatacards(self, output, verbose=1):
     try:
