@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def integrate_uproot(hist, start, end):
     int_values = np.sum(hist.values()[start:end+1])
-    int_errors = np.sum(hist.errors()[start:end+1])
+    int_errors = np.sum((hist.errors()[start:end+1])**(2.0))
     return [int_values, int_errors]
 
 def convert_to_json(bins_dict, params):
@@ -94,10 +94,18 @@ def optimize_binning(filename, params, sig_string, mass_list):
                     curr_integral_signal = integrate_uproot(hists[signal_name], left_edge, right_edge)[0]
                     integral_bkgs = np.zeros(len(important_backgrounds))
                     integral_bkgs_unc = np.zeros(len(important_backgrounds))
+                    tot_bkgs = 0
+                    tot_bkgs_unc = 0
                     for i, bkg_name in enumerate(important_backgrounds):
                         int_bkg = integrate_uproot(hists[bkg_name], left_edge, right_edge)
-                        integral_bkgs[i] = int_bkg[0]
-                        integral_bkgs_unc[i] = int_bkg[1]
+                        if bkg_name == 'TT': #Only use TT for the later error check for now
+                            integral_bkgs[i] = int_bkg[0]
+                            integral_bkgs_unc[i] = (int_bkg[1])**(0.5)
+
+                        tot_bkgs += int_bkg[i]
+                        tot_bkgs_unc += integral_bkgs_unc[i]
+
+                    tot_bkgs_unc = tot_bkgs_unc**(0.5)
 
 
                     if left_edge ==  0:
@@ -112,8 +120,10 @@ def optimize_binning(filename, params, sig_string, mass_list):
                         for bkg_name in bkg_names:
                             print(f"{bkg_name} has {integrate_uproot(hists[bkg_name], left_edge, right_edge)[0]} entries")
 
+                        print(f"And the total bkg / tot bkg unc is {tot_bkgs} / {tot_bkgs_unc} = {tot_bkgs/tot_bkgs_unc}")
 
-                    if (tot_integral_signal >= big_bin_counter*bin_content_goal) and (np.max(integral_bkgs_unc/integral_bkgs) <= 0.2):                            
+
+                    if (tot_integral_signal >= big_bin_counter*bin_content_goal) and (np.max(integral_bkgs_unc/integral_bkgs) <= 0.2) and (tot_bkgs_unc/tot_bkgs <= 0.2):       
                         custom_binning.append(round(hists[signal_name].axis().edges()[left_edge], 2))
                         custom_totals.append(curr_integral_signal)
                         print("At bin ", left_edge, " integral is ", custom_totals[-1])
@@ -200,5 +210,6 @@ if __name__ == '__main__':
 
         shapes_dir = "/eos/user/d/daebi/bbWW_shape_files/Run3_2022/"
 
-        for mass in [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]:
+        masslist = [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
+        for mass in masslist:
             optimize_binning(shapes_dir+f"shape_m{mass}.root", {'MX': mass}, f'ggRadion_HH_bbWW_M{mass}', mass)
