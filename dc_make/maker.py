@@ -151,12 +151,6 @@ class DatacardMaker:
         hist = file.Get(hist_name)
         if hist == None:
           raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
-      """
-      if self.hist_bins is not None:
-        new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(self.hist_bins) - 1, self.hist_bins.data())
-        rebinAndFill(new_hist, hist)
-        hist = new_hist
-      """
       hist = self.hist_binner.applyBinning(era, channel, category, model_params, hist)
       
       hist.SetDirectory(0)
