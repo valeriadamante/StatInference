@@ -261,7 +261,23 @@ class DatacardMaker:
       shape_file = os.path.join(output, f"{proc_name}.root")
       self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
 
-      #Want to add some subdirectories with cards that do only specific channels/categories/eras for debugging
+      for subera in self.eras:
+        for subchannel in self.channels:
+          tmp_output = output+f'/{subera}/{subchannel}/'
+          os.makedirs(tmp_output, exist_ok=True)
+          tmp_dc_file = os.path.join(tmp_output, f"datacard_{proc_name}.txt")
+          tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          self.cb.cp().era([subera]).channel([subchannel]).mass(param_list).process(processes).WriteDatacard(tmp_dc_file, tmp_shape_file)
+
+        for subcat in self.categories:
+          binset = [ self.getBin(subera, ch, subcat, return_index=False) for ch in self.channels ]
+          tmp_output = output+f'/{subera}/{subcat}/'
+          os.makedirs(tmp_output, exist_ok=True)
+          tmp_dc_file = os.path.join(tmp_output, f"datacard_{proc_name}.txt")
+          tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          self.cb.cp().era([subera]).bin(binset).mass(param_list).process(processes).WriteDatacard(tmp_dc_file, tmp_shape_file)
+
+
 
   def createDatacards(self, output, verbose=1):
     try:
