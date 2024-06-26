@@ -79,16 +79,6 @@ class DatacardMaker:
     hist_bins = hist_bins or cfg.get("hist_bins", None)
     self.hist_binner = Binner(hist_bins)
 
-
-
-    """
-    self.hist_bins = hist_bins
-    if self.hist_bins is None:
-      self.hist_bins = cfg.get("hist_bins", None)
-    if self.hist_bins is not None:
-      self.hist_bins = listToVector(self.hist_bins, 'double')
-    """
-
     self.input_files = {}
     self.shapes = {}
 
