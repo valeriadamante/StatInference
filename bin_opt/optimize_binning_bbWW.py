@@ -16,11 +16,6 @@ def convert_to_json(bins_dict, params):
         ch = key.split("_")[0]
         cat = key.split("_")[1]
         exists = False
-        #for entry in json_dict:
-        #    if entry['bins'] == bins_dict[key]:
-        #        entry['channels'].append(ch)
-        #        entry['categories'].append(cat)
-        #        exists = True
         if not exists:
             entry = {
                     'bins': bins_dict[key],
@@ -69,8 +64,7 @@ def optimize_binning(shapes_dir, filename, sig_string, params, mass_list, outdir
 
         print(f"Starting ch cat {ch_cat}")
         
-        #signal_name = 'ggRadion_HH_bbWW_M300' #Update to get from yaml later
-        signal_name = sig_string
+        signal_name = sig_string #Maybe update to get from yaml later
         #important_backgrounds = ['TT', 'DY', 'ST']
         important_backgrounds = ['TT']
 
@@ -193,7 +187,6 @@ def optimize_binning(shapes_dir, filename, sig_string, params, mass_list, outdir
 
     print(limit_list)
     plt.plot(limit_list)
-    #plt.show()
     plt.yscale('log')
     plot_filename = os.path.join(outdir, f'binopt_history_{sig_string}.pdf')
     plt.savefig(plot_filename)
@@ -233,5 +226,4 @@ if __name__ == '__main__':
         file_name_pattern = args.file_name_pattern
 
         for mass in mass_list:
-            #optimize_binning(shapes_dir+f"shape_m{mass}.root", {'MX': mass}, signal_name_pattern.format(mass), mass, outdir, config, nBinsMax)
             optimize_binning(shapes_dir, file_name_pattern.format(mass), signal_name_pattern.format(mass), {'MX': mass}, mass, outdir, config, nBinsMax)
