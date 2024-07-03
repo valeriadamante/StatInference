@@ -38,8 +38,9 @@ def convert_to_json(bins_dict, params):
 
 
 #This will need to loop over files too
-def optimize_binning(filename, params, sig_string, mass_list):
-    file = uproot.open(filename)
+def optimize_binning(shapes_dir, filename, sig_string, params, mass_list, outdir, config, nBinsMax):
+    os.makedirs(outdir, exist_ok=True)
+    file = uproot.open(os.path.join(shapes_dir, filename))
 
     limit_history = {}
     limit_list = []
@@ -47,7 +48,7 @@ def optimize_binning(filename, params, sig_string, mass_list):
     best_limit = np.inf
     best_bins = None
 
-    nBinsMax = 20
+    nBinsMax = nBinsMax
 
     bkg_names = ['TT', 'DY', 'ST', 'VV']
 
@@ -148,17 +149,20 @@ def optimize_binning(filename, params, sig_string, mass_list):
 
             json_dict = convert_to_json(bins_dict, params)
 
-            with open(f'tmp_binning_{sig_string}.json', 'w') as f:
+            with open(os.path.join(outdir, f'tmp_binning_{sig_string}.json'), 'w') as f:
                 json.dump(json_dict, f)
 
 
             #Create the datacards
-            ps_call(f"python3 ../dc_make/create_datacards.py --input /eos/user/d/daebi/bbWW_shape_files --output tmp_datacards_{sig_string} --config ../config/x_hh_bbww_run3.yaml --hist-bins ./tmp_binning_{sig_string}.json --param_values {mass_list}", shell=True)
+            datacards_dir = os.path.join(outdir, f'tmp_datacards_{sig_string}')
+            binning_file = os.path.join(outdir, f'tmp_binning_{sig_string}.json')
+
+            ps_call(f"python3 ../dc_make/create_datacards.py --input {shapes_dir} --output {datacards_dir} --config {config} --hist-bins ./{binning_file} --param_values {mass_list}", shell=True)
             #Find out where the limits will be saved
-            output = ps_call(f"law run MergeResonantLimits --version dev --datacards 'tmp_datacards_{sig_string}/*.txt' --print-output 0,False", shell=True, catch_stdout=True, split="\n")[1]
+            output = ps_call(f"law run MergeResonantLimits --version dev --datacards '{datacards_dir}/*.txt' --print-output 0,False", shell=True, catch_stdout=True, split="\n")[1]
             limit_file_name = output[-2]
             #Run the limit calculation
-            ps_call(f"law run MergeResonantLimits --version dev --datacards 'tmp_datacards_{sig_string}/*.txt' --remove-output 3,a,y", shell=True)
+            ps_call(f"law run MergeResonantLimits --version dev --datacards '{datacards_dir}/*.txt' --remove-output 3,a,y", shell=True)
 
             #Now load the output numpy array and get value [1] (mass, val, up1, down1, up2, down2)
             print(np.load(limit_file_name).files)
@@ -191,7 +195,8 @@ def optimize_binning(filename, params, sig_string, mass_list):
     plt.plot(limit_list)
     #plt.show()
     plt.yscale('log')
-    plt.savefig(f"binopt_history_{sig_string}.pdf")
+    plot_filename = os.path.join(outdir, f'binopt_history_{sig_string}.pdf')
+    plt.savefig(plot_filename)
     plt.close()
 
 
@@ -207,9 +212,26 @@ if __name__ == '__main__':
         __package__ = pkg_dir_name
 
         from RunKit.run_tools import ps_call
+        import argparse
+        parser = argparse.ArgumentParser(description='Optimize Binning.')
+        parser.add_argument('--input-shapes', required=True, type=str, help="input directory of shape files")
+        parser.add_argument('--output', required=True, type=str, help="output directory for new binning, shapes, and datacards")
+        parser.add_argument('--config', required=True, type=str, help="configuration file")
+        parser.add_argument('--mass-list', required=True, type=str, help="list of mass values to scan over")
+        parser.add_argument('--nBinsMax', required=False, type=int, default=20, help="Maximum number of bins to test")
+        parser.add_argument('--sig-name-pattern', required=False, type=str, default="ggRadion_HH_bbWW_M{}", help="Name format of signal in the shape files")
+        parser.add_argument('--file-name-pattern', required=False, type=str, default="Run3_2022/shape_m{}.root", help="Name format of input shape files")
+        args = parser.parse_args()
 
-        shapes_dir = "/eos/user/d/daebi/bbWW_shape_files/Run3_2022/"
 
-        masslist = [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
-        for mass in masslist:
-            optimize_binning(shapes_dir+f"shape_m{mass}.root", {'MX': mass}, f'ggRadion_HH_bbWW_M{mass}', mass)
+        mass_list = [ int(x) for x in args.mass_list.split(',') ]
+        shapes_dir = args.input_shapes
+        outdir = args.output
+        config = args.config
+        nBinsMax = args.nBinsMax
+        signal_name_pattern = args.sig_name_pattern
+        file_name_pattern = args.file_name_pattern
+
+        for mass in mass_list:
+            #optimize_binning(shapes_dir+f"shape_m{mass}.root", {'MX': mass}, signal_name_pattern.format(mass), mass, outdir, config, nBinsMax)
+            optimize_binning(shapes_dir, file_name_pattern.format(mass), signal_name_pattern.format(mass), {'MX': mass}, mass, outdir, config, nBinsMax)
