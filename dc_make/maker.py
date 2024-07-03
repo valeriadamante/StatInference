@@ -247,7 +247,7 @@ class DatacardMaker:
 
       for subera in self.eras:
         for subchannel in self.channels:
-          tmp_output = output+f'/{subera}/{subchannel}/'
+          tmp_output = os.path.join(output, subera, subchannel)
           os.makedirs(tmp_output, exist_ok=True)
           tmp_dc_file = os.path.join(tmp_output, f"datacard_{proc_name}.txt")
           tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
