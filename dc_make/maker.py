@@ -242,14 +242,16 @@ class DatacardMaker:
         param_list.append('*')
       dc_file = os.path.join(output, f"datacard_{proc_name}.txt")
       shape_file = os.path.join(output, f"{proc_name}.root")
-      self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
 
       for subera in self.eras:
         for subchannel in self.channels:
           tmp_output = os.path.join(output, subera, subchannel)
           os.makedirs(tmp_output, exist_ok=True)
           tmp_dc_file = os.path.join(tmp_output, f"datacard_{proc_name}.txt")
-          tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          #tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          #Setting the temp shape file to the same location as the total shape file will let the datacard
+          #Point to the total shape file, reducing the number of copies of the shape files
+          tmp_shape_file = shape_file
           self.cb.cp().era([subera]).channel([subchannel]).mass(param_list).process(processes).WriteDatacard(tmp_dc_file, tmp_shape_file)
 
         for subcat in self.categories:
@@ -257,8 +259,12 @@ class DatacardMaker:
           tmp_output = output+f'/{subera}/{subcat}/'
           os.makedirs(tmp_output, exist_ok=True)
           tmp_dc_file = os.path.join(tmp_output, f"datacard_{proc_name}.txt")
-          tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          #tmp_shape_file = os.path.join(tmp_output, f"{proc_name}.root")
+          tmp_shape_file = shape_file
           self.cb.cp().era([subera]).bin(binset).mass(param_list).process(processes).WriteDatacard(tmp_dc_file, tmp_shape_file)
+
+      #Creating the total shape file at the end will overwrite the previous "temporary" shape files
+      self.cb.cp().mass(param_list).process(processes).WriteDatacard(dc_file, shape_file)
 
 
 
