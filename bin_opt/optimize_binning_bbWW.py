@@ -1,0 +1,238 @@
+import numpy as np
+import os
+import uproot
+import json
+import sys
+import matplotlib.pyplot as plt
+
+def integrate_uproot(hist, start, end):
+    int_values = np.sum(hist.values()[start:end+1])
+    int_errors = np.sqrt(np.sum((hist.errors()[start:end+1])**(2.0)))
+    return [int_values, int_errors]
+
+def convert_to_json(bins_dict, params):
+    json_dict = []
+    for key in bins_dict.keys():
+        ch = key.split("_")[0]
+        cat = key.split("_")[1]
+        exists = False
+        if not exists:
+            entry = {
+                    'bins': bins_dict[key],
+                    'channels': [ch],
+                    'categories': [cat],
+                }
+            for key, value in params.items():
+                entry[key] = [ value ]
+            json_dict.append(entry)
+                
+            
+    print(json_dict)
+    return json_dict
+
+
+
+#This will need to loop over files too
+def optimize_binning(shapes_dir, filename, sig_string, params, mass_list, outdir, config, nBinsMax, background_names, important_backgrounds, categories, channels, tag):
+    os.makedirs(outdir, exist_ok=True)
+    file = uproot.open(os.path.join(shapes_dir, filename))
+
+    limit_history = {}
+    limit_list = []
+
+    best_limit = np.inf
+    best_bins = None
+
+    nBinsMax = nBinsMax
+
+    #bkg_names = ['TT', 'DY', 'ST', 'VV'] #Moved to an argument
+    bkg_names = background_names
+
+    priority_list = []
+    bins_dict = {}
+    for cat in categories:
+        for ch in channels:
+            priority_list.append((ch, cat))
+            dict_key = f'{ch}_{cat}'
+            bins_dict[dict_key] = [0.0, 1.0]
+            limit_history[dict_key] = {'nBins': [], 'limits': []}
+
+    for ch, cat in priority_list:
+        ch_cat = f'{ch}/{cat}/'
+        dict_key = f'{ch}_{cat}'
+        hist_names = [ key.split(';')[0][len(ch_cat):] for key in file.keys() if key.startswith(ch_cat) ]
+        hists = { hist_name : file[ch_cat+hist_name] for hist_name in hist_names }
+
+        print(f"Starting ch cat {ch_cat}")
+        
+        signal_name = sig_string #Maybe update to get from yaml later
+
+        tmp_signal = np.sum(hists[signal_name].values())
+
+        #Start the loop over nBins from 1 to nBinsMax
+        for nbins in range(1, nBinsMax):
+            bin_content_goal = tmp_signal/nbins
+
+            print(f"Channel {ch_cat} has a total of {tmp_signal} entries, so with {nbins} bins our per-bin goal is {bin_content_goal}")
+
+            custom_binning = [1.0]
+            custom_totals = []
+            done = False
+            nBins = len(hists[signal_name].values())-1
+            right_edge = nBins
+            big_bin_counter = 1
+            while not done:
+                for left_edge in range(right_edge, -1, -1):
+                    tot_integral_signal = integrate_uproot(hists[signal_name], left_edge, nBins)[0]
+                    curr_integral_signal = integrate_uproot(hists[signal_name], left_edge, right_edge)[0]
+                    integral_bkgs = np.zeros(len(important_backgrounds))
+                    integral_bkgs_unc = np.zeros(len(important_backgrounds))
+                    tot_bkgs = 0
+                    tot_bkgs_unc = 0
+                    for i, bkg_name in enumerate(bkg_names):
+                        int_bkg = integrate_uproot(hists[bkg_name], left_edge, right_edge)
+                        if bkg_name in important_backgrounds: #Only check important backgrounds for the individual tests
+                            integral_bkgs[i] = int_bkg[0]
+                            integral_bkgs_unc[i] = (int_bkg[1])
+
+                        tot_bkgs += int_bkg[0] #But check all backgrounds for the total tests
+                        tot_bkgs_unc += (int_bkg[1]**(2.0))
+
+                    tot_bkgs_unc = np.sqrt(tot_bkgs_unc)
+
+
+                    if left_edge ==  0:
+                        custom_binning.append(left_edge)
+                        custom_totals.append(curr_integral_signal)
+                        done = True
+                        break
+
+                    if (tot_integral_signal >= big_bin_counter*bin_content_goal):
+                        print(f"Check out the background unc/tot {integral_bkgs_unc/integral_bkgs}")
+                        print(f"Check the backgrounds for empty bins")
+                        for bkg_name in bkg_names:
+                            print(f"{bkg_name} has {integrate_uproot(hists[bkg_name], left_edge, right_edge)[0]} entries")
+
+                        print(f"And the total bkg / tot bkg unc is {tot_bkgs} / {tot_bkgs_unc} = {tot_bkgs/tot_bkgs_unc}")
+
+
+                    if (tot_integral_signal >= big_bin_counter*bin_content_goal) and (np.max(integral_bkgs_unc/integral_bkgs) <= 0.2) and (tot_bkgs_unc/tot_bkgs <= 0.2):       
+                        custom_binning.append(round(hists[signal_name].axis().edges()[left_edge], 2))
+                        custom_totals.append(curr_integral_signal)
+                        print("At bin ", left_edge, " integral is ", custom_totals[-1])
+                        right_edge = left_edge-1
+                        big_bin_counter+=1
+                        break
+
+            print("Found the bin edge set, it is ", custom_binning)
+            print("With totals per bin as ", custom_totals)
+
+            if custom_totals[-1] < 0.2*bin_content_goal:
+                print("Final bin was very very small, auto merged!")
+                del custom_binning[-2]
+                print("New binning is ", custom_binning)
+
+            custom_binning.sort()
+            bins_dict[dict_key] = custom_binning
+
+            print("Final dict binnings are ", bins_dict)
+
+
+
+            json_dict = convert_to_json(bins_dict, params)
+
+            with open(os.path.join(outdir, f'tmp_binning_{sig_string}.json'), 'w') as f:
+                json.dump(json_dict, f)
+
+
+            #Create the datacards
+            datacards_dir = os.path.join(outdir, f'tmp_datacards_{sig_string}')
+            binning_file = os.path.join(outdir, f'tmp_binning_{sig_string}.json')
+
+            ps_call(f"python3 ../dc_make/create_datacards.py --input {shapes_dir} --output {datacards_dir} --config {config} --hist-bins ./{binning_file} --param_values {mass_list}", shell=True)
+            #Find out where the limits will be saved
+            output = ps_call(f"law run MergeResonantLimits --version {tag} --datacards '{datacards_dir}/*.txt' --print-output 0,False", shell=True, catch_stdout=True, split="\n")[1]
+            limit_file_name = output[-2]
+            #Run the limit calculation
+            ps_call(f"law run MergeResonantLimits --version {tag} --datacards '{datacards_dir}/*.txt' --remove-output 3,a,y", shell=True)
+
+            #Now load the output numpy array and get value [1] (mass, val, up1, down1, up2, down2)
+            print(np.load(limit_file_name).files)
+            data = np.load(limit_file_name)
+            exp_limit = data[data.files[0]][0][1]
+
+            limit_history[dict_key]['nBins'].append(nbins)
+            limit_history[dict_key]['limits'].append(exp_limit)
+            limit_list.append(exp_limit)
+
+            #If adding a bin does not improve (limit stays the same) then just move on
+            if (exp_limit < best_limit) or (nbins == 1):
+                best_limit = exp_limit
+                best_bins = bins_dict.copy()
+
+            else:
+                print(f"Did not improve limits at nbins {nbins}, best limit was {best_limit}, and current was {exp_limit}")
+                #Need to replace the bin dict because it now has the 'worse' new binning
+                bins_dict = best_bins.copy()
+                break
+
+
+
+
+
+    print("Finished the limit scan, lets look at the history")
+    print(limit_history)
+
+    print(limit_list)
+    plt.plot(limit_list)
+    plt.yscale('log')
+    plot_filename = os.path.join(outdir, f'binopt_history_{sig_string}.pdf')
+    plt.savefig(plot_filename)
+    plt.close()
+
+
+
+
+if __name__ == '__main__':
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        pkg_dir = os.path.dirname(file_dir)
+        base_dir = os.path.dirname(pkg_dir)
+        pkg_dir_name = os.path.split(pkg_dir)[1]
+        if base_dir not in sys.path:
+            sys.path.append(base_dir)
+        __package__ = pkg_dir_name
+
+        from RunKit.run_tools import ps_call
+        import argparse
+        parser = argparse.ArgumentParser(description='Optimize Binning.')
+        parser.add_argument('--input-shapes', required=True, type=str, help="input directory of shape files")
+        parser.add_argument('--output', required=True, type=str, help="output directory for new binning, shapes, and datacards")
+        parser.add_argument('--config', required=True, type=str, help="configuration file")
+        parser.add_argument('--mass-list', required=True, type=str, help="list of mass values to scan over")
+        parser.add_argument('--nBinsMax', required=False, type=int, default=20, help="Maximum number of bins to test")
+        parser.add_argument('--sig-name-pattern', required=False, type=str, default="ggRadion_HH_bbWW_M{}", help="Name format of signal in the shape files")
+        parser.add_argument('--file-name-pattern', required=False, type=str, default="Run3_2022/shape_m{}.root", help="Name format of input shape files")
+        parser.add_argument('--background-names', required=False, type=str, default="TT,DY,ST,VV", help="List of all background processes in the shapes file")
+        parser.add_argument('--important-backgrounds', required=False, type=str, default="TT", help="List of background processes to consider for individual statistics")
+        parser.add_argument('--categories', required=False, type=str, default="res2b,boost,res1b", help="List of jet categories")
+        parser.add_argument('--channels', required=False, type=str, default="mumu,emu,ee", help="List of lepton channels")
+        parser.add_argument('--tag', required=False, type=str, default="dev", help="Name of combine job")
+
+        args = parser.parse_args()
+
+
+        mass_list = [ int(x) for x in args.mass_list.split(',') ]
+        shapes_dir = args.input_shapes
+        outdir = args.output
+        config = args.config
+        nBinsMax = args.nBinsMax
+        signal_name_pattern = args.sig_name_pattern
+        file_name_pattern = args.file_name_pattern
+        background_names = [ x for x in args.background_names.split(',') ]
+        important_backgrounds = [ x for x in args.important_backgrounds.split(',') ]
+        categories = [ x for x in args.categories.split(',') ]
+        channels = [ x for x in args.channels.split(',') ]
+        tag = args.tag
+
+        for mass in mass_list:
+            optimize_binning(shapes_dir, file_name_pattern.format(mass), signal_name_pattern.format(mass), {'MX': mass}, mass, outdir, config, nBinsMax, background_names, important_backgrounds, categories, channels, tag)
