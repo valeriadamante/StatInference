@@ -1,7 +1,7 @@
 from ..common.param_parse import extractParameters, applyParameters, parameterListToDict
 
 class Process:
-  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, allowNegativeContributions=False,subprocesses=[], isRelatedTo=None):
+  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, subprocesses=None):
     self.name = name
     self.hist_name = hist_name
     self.is_signal = is_signal
@@ -10,8 +10,6 @@ class Process:
     self.is_background = not (is_signal or is_data)
     self.scale=scale
     self.params = params
-    self.allowNegativeContributions = allowNegativeContributions
-    self.isRelatedTo = isRelatedTo
     self.subprocesses = subprocesses
 
     if is_data and is_signal:
@@ -56,8 +54,6 @@ class Process:
     is_signal = entry.get("is_signal", False)
     is_data = entry.get("is_data", False)
     is_asimov_data = entry.get("is_asimov_data", False)
-    allowNegativeContributions = entry.get("allowNegativeContributions", False)
-    isRelatedTo = entry.get("isRelatedTo", False)
     subprocesses = entry.get("subprocesses", [])
     scale = entry.get("scale", 1)
     if type(scale) == str:
@@ -66,7 +62,7 @@ class Process:
       if is_signal and len(model.parameters) > 0:
         raise RuntimeError("Signal process must have parameter values")
       return [ Process(base_name, base_hist_name, is_signal=is_signal, is_data=is_data, is_asimov_data=is_asimov_data,
-                       scale=scale,allowNegativeContributions=allowNegativeContributions,subprocesses=subprocesses, isRelatedTo=isRelatedTo) ]
+                       scale=scale,subprocesses=subprocesses )]
 
     parameters = model.parameters if is_signal else extractParameters(base_name)
     param_values = entry["param_values"]

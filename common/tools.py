@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class PackageWrapper:
   def __init__(self, import_fn):
@@ -40,6 +41,8 @@ def rebinAndFill(new_hist, old_hist, epsilon=1e-7):
     old_max = old_axis.GetBinUpEdge(old_axis.GetNbins())
     new_min = new_axis.GetBinLowEdge(1)
     new_max = new_axis.GetBinUpEdge(new_axis.GetNbins())
+    #print(old_min, old_max)
+    #print(new_min, new_max)
     return old_min <= new_min and old_max >= new_max
 
   def get_new_bin(old_axis, new_axis, bin_id_old):
@@ -99,12 +102,103 @@ def hasRelevantNegativeBins(histogram, relevant_bins = []):
       return True
   return False
 
-def hasNegativeBins(histogram):
-  k=1
-  for n in range(1, histogram.GetNbinsX() + 1):
-    if histogram.GetBinContent(n) < 0 :
-      if round(abs(histogram.GetBinContent(n)),10)+ k*round(abs(histogram.GetBinError(n)),10)>=0:
-        return False
-      print(f"for bin {n} histogram has {histogram.GetBinContent(n)} and error {histogram.GetBinError(n)}")
-      return True
-  return False
+
+def th1ToNumpy(histogram, include_overflow=False):
+    bin_range = (0, histogram.GetNbinsX() + 1) if include_overflow else (1, histogram.GetNbinsX())
+    n_bins = bin_range[1] - bin_range[0] + 1
+    bin_contents = np.zeros(n_bins)
+    bin_errors = np.zeros(n_bins)
+    bin_numbers = np.zeros(n_bins, dtype=int)
+    bin_indices = {}
+    for bin_idx, bin_number in enumerate(range(bin_range[0], bin_range[1] + 1)):
+        bin_contents[bin_idx] = histogram.GetBinContent(bin_number)
+        bin_errors[bin_idx] = histogram.GetBinError(bin_number)
+        bin_numbers[bin_idx] = bin_number
+        bin_indices[bin_number] = bin_idx
+    return bin_indices, bin_numbers, bin_contents, bin_errors
+
+class NegativeBinSolution:
+    def __init__(self):
+        self.accepted = True
+        self.integral = None
+        self.has_zero_integral = False
+        self.has_negative_integral = False
+        self.negative_bins = set()
+        self.negative_bins_within_error = set()
+        self.relevant_negative_bins = set()
+        self.changed_bins = set()
+
+def resolveNegativeBins(histogram, allow_zero_integral=False, allow_negative_integral=False,
+                        allow_negative_bins_within_error=False, max_n_sigma_for_negative_bins=1,
+                        relevant_bins=None, include_overflow=False):
+    relevant_bins = relevant_bins or []
+    bin_indices, bin_numbers, bin_contents, bin_errors = th1ToNumpy(histogram, include_overflow)
+    n_bins = len(bin_numbers)
+
+    solution = NegativeBinSolution()
+    solution.integral = np.sum(bin_contents)
+    if solution.integral == 0:
+        solution.has_zero_integral = True
+        solution.accepted = allow_zero_integral
+        #print("integral = 0")
+        return solution
+    if solution.integral < 0:
+        solution.has_negative_integral = True
+        solution.accepted = allow_negative_integral
+        #print("integral < 0")
+        return solution
+
+    donor_integral = 0.
+    negative_integral = 0.
+
+    for bin_idx in range(n_bins):
+        if bin_contents[bin_idx] >= 0:
+            if bin_numbers[bin_idx] not in relevant_bins:
+                donor_integral += bin_contents[bin_idx]
+            continue
+        negative_integral += bin_contents[bin_idx]
+        solution.negative_bins.add(bin_numbers[bin_idx])
+        #print(bin_idx, bin_numbers[bin_idx])
+        zero_within_error = bin_contents[bin_idx] + max_n_sigma_for_negative_bins * bin_errors[bin_idx] >= 0
+        if zero_within_error:
+            solution.negative_bins_within_error.add(bin_numbers[bin_idx])
+        if not allow_negative_bins_within_error or not zero_within_error:
+            solution.accepted = False
+        if bin_numbers[bin_idx] in relevant_bins:
+            solution.relevant_negative_bins.add(bin_numbers[bin_idx])
+            solution.accepted = False
+
+    if abs(negative_integral) > donor_integral:
+        solution.accepted = False
+
+    if not solution.accepted or len(solution.negative_bins) == 0:
+        #print("solution not accepted or len solution(negative bins) = 0")
+        return solution
+
+    for bin_number in solution.negative_bins:
+        bin_idx = bin_indices[bin_number]
+        donor_bin_indices = []
+        for i in range(n_bins):
+            if i != bin_idx and bin_numbers[i] not in relevant_bins and bin_contents[i] > 0:
+                donor_bin_indices.append(i)
+        donor_bin_indices = sorted(donor_bin_indices, key=lambda i: abs(i-bin_idx))
+        to_balance = -bin_contents[bin_idx]
+        bin_errors[bin_idx] = math.sqrt(bin_contents[bin_idx] ** 2 + bin_errors[bin_idx] ** 2)
+        bin_contents[bin_idx] = 0
+        solution.changed_bins.add(bin_number)
+        for donor_bin_idx in donor_bin_indices:
+            donor_contribution = min(to_balance, bin_contents[donor_bin_idx])
+            if donor_contribution <= 0: continue
+            bin_errors[donor_bin_idx] = math.sqrt(donor_contribution ** 2 + bin_errors[donor_bin_idx] ** 2)
+            bin_contents[donor_bin_idx] -= donor_contribution
+            solution.changed_bins.add(bin_numbers[donor_bin_idx])
+            to_balance -= donor_contribution
+            if to_balance <= 0: break
+        if to_balance > 0: # this should not happen, because we checked that negative_integral <= donor_integral
+            raise RuntimeError(f"resolveNegativeBins: failed to balance bin {bin_number}")
+    for bin_number in solution.changed_bins:
+        bin_idx = bin_indices[bin_number]
+        histogram.SetBinContent(int(bin_number), bin_contents[bin_idx])
+        histogram.SetBinError(int(bin_number), bin_errors[bin_idx])
+
+    return solution

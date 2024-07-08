@@ -35,10 +35,6 @@ class Uncertainty:
       if item==True:
         match_one_subpr=True
         break
-    #print(Uncertainty.hasMatch(process.name, self.processes) or match_one_subpr)
-    #print(Uncertainty.hasMatch(era, self.eras))
-    #print(Uncertainty.hasMatch(channel, self.channels))
-    #print(Uncertainty.hasMatch(category, self.categories))
     return  (Uncertainty.hasMatch(process.name, self.processes) or match_one_subpr) \
         and Uncertainty.hasMatch(era, self.eras) \
         and Uncertainty.hasMatch(channel, self.channels) \
@@ -73,9 +69,6 @@ class Uncertainty:
     if len(patterns) == 0:
       return True
     for pattern in patterns:
-      #print(f"value = {value}")
-      #print(pattern)
-      #print(value == pattern)
       if pattern[0] == '^':
         if re.match(pattern, value):
           return True
@@ -97,7 +90,7 @@ class Uncertainty:
       return v
 
     args = {}
-    for key in [ "processes", "eras", "channels", "categories"]:
+    for key in [ "processes", "eras", "channels", "categories" ]:
       args[key] = getPatternList(key)
 
     if unc_type == UncertaintyType.lnN:
@@ -109,6 +102,7 @@ class Uncertainty:
       elif type(value) == dict :
         value = value
       else:
+        print(type(value))
         raise RuntimeError("Invalid lnN uncertainty value")
 
     if unc_type == UncertaintyType.lnN:

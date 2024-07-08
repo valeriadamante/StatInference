@@ -1,15 +1,19 @@
-analysis: hh_bbt
+analysis: hh_bbtt
 type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: false
   input_file_pattern: ${ERA}.root
-hist_bins: [245, 350, 450,600,750,1250,3500]
+hist_bins:
+  inclusive: [245, 350, 450,600,750,1250,3505]
+  res1b: [245, 350, 450,600,750,1250,3505]
+  res2b: [245, 350, 450,600,750,1100,3505]
+  boosted: [245,600,3505]
 eras:
-  - Run_2018
+  #- Run_2018
   #- Run_2017
   #- Run_2016
-  #- Run_2016_HIPM
+  - Run_2016_HIPM
 channels:
   #- eTau
   #- muTau
@@ -29,25 +33,20 @@ processes:
     is_signal: true
     scale: 2 * 6.272E-02 * 5.824E-01
   - process: TT
-    #subprocesses:
   - process: DY
   - process: VV
-    allowNegativeContributions: True
     subprocesses:
     - WW
     - WZ
     - ZZ
   - process: ST
-    allowNegativeContributions: True
     subprocesses:
     - ST_tW_antitop_5f_InclusiveDecays
     - ST_tW_top_5f_InclusiveDecays
     - ST_t-channel_antitop_4f_InclusiveDecays
     - ST_t-channel_top_4f_InclusiveDecays
   #- process: TW
-  #  allowNegativeContributions: True
   - process: TTX
-    allowNegativeContributions: True
     subprocesses:
     - TTWJetsToLNu
     - TTWJetsToQQ
@@ -55,7 +54,6 @@ processes:
     - TTWZ
     - TTWH
     - TTZH
-    - TTZToLLNuNu_M-10
     - TTZToQQ
     - TTZZ
     - TTZToNuNu
@@ -63,41 +61,20 @@ processes:
     - TTGamma_Hadronic
     - TTGamma_SingleLept
     - TTGG
-    - TTZZTo4b
-    - TTZZToNon4b
-    - TTZHTo4b
     - TTWH
-    - TTZHTo4b
-    - TTZHToNon4b
     - TTZH
     - TTTJ
     - TTTT
     - TTTW
     - TT4b
   - process: W
-    #subprocesses:
-    #- WJetsToLNu
-    #- W1JetsToLNu
-    #- W2JetsToLNu
-    #- W3JetsToLNu
-    #- W4JetsToLNu
-    #- WJetsToLNu_HT-70To100
-    #- WJetsToLNu_HT-100To200
-    #- WJetsToLNu_HT-1200To2500
-    #- WJetsToLNu_HT-200To400
-    #- WJetsToLNu_HT-2500ToInf
-    #- WJetsToLNu_HT-400To600
-    #- WJetsToLNu_HT-600To800
-    #- WJetsToLNu_HT-800To1200
   - process: EWK
-    allowNegativeContributions: True
     subprocesses:
     - EWK_WplusToLNu
     - EWK_WminusToLNu
     - EWK_ZTo2L
     - EWK_ZTo2Nu
   - process: VVV
-    allowNegativeContributions: True
     subprocesses:
     - WWW_4F
     - WWZ_4F
@@ -105,34 +82,17 @@ processes:
     - ZZZ
   - process: QCD
   - process: ZJNuNu
-    allowNegativeContributions: True
-    #subprocesses:
-    #- ZJetsToNuNu_HT-100To200
-    #- ZJetsToNuNu_HT-1200To2500
-    #- ZJetsToNuNu_HT-200To400
-    #- ZJetsToNuNu_HT-2500ToInf
-    #- ZJetsToNuNu_HT-400To600
-    #- ZJetsToNuNu_HT-600To800
-    #- ZJetsToNuNu_HT-800To1200
-  - process: ggH_htt
-    allowNegativeContributions: True
+  - process: ggH
     subprocesses:
     - GluGluHToTauTau_M125
-    isRelatedTo: VH
-  - process: qqH_htt
-    allowNegativeContributions: True
+    - ggHToZZTo2L2Q
+    - GluGluHToWWTo2L2Nu_M125
+  - process: qqH
     subprocesses:
     - VBFHToTauTau_M125
     - VBFHToWWTo2L2Nu_M125
+    - VBFHToWWTo2L2Nu_M125
   - process: VH
-    allowNegativeContributions: True
-    subprocesses:
-      - ggHToZZTo2L2Q
-      - GluGluHToWWTo2L2Nu_M125
-      - VBFHToWWTo2L2Nu_M125
-
-  - process: VH
-    allowNegativeContributions: True
     subprocesses:
     - HZJ_HToWW_M125
     - HWplusJ_HToWW_M125
@@ -144,7 +104,6 @@ processes:
     - WminusHToTauTau_M125
     - ZHToTauTau_M125
   - process: ttH
-    allowNegativeContributions: True
     subprocesses:
     - ttH
 
@@ -152,15 +111,6 @@ uncertainties:
   - name: lumi_13TeV
     type: lnN
     value: 0.03
-  - name: pdf_gg
-    type: lnN
-    value: 0.042
-  - name: BR_hbb
-    type: lnN
-    value:  0.0124
-    processes:
-      - ZH_Hbb_Zqq
-      - ZH_Hbb_Zll
   - name: BR_htt
     type: lnN
     value: 0.0165
@@ -169,68 +119,48 @@ uncertainties:
     - ggH_htt
     - qqH_htt
     - VH_htt
-  #- name: QCDscale_V
-  #  type: lnN
-  #  value:
-  #  - value: 0.008
-  #    processes:
-  #    - W
-  #  - value: 0.02
-  #    processes:
-  #    - EWK_WminusToLNu
-  #    - EWK_WplusToLNu
-  #    - EWK_ZTo2L
-  #    - EWK_ZTo2Nu
-  #- name: QCDscale_VH
-  #  type: lnN
-  #  value:
-  #  - value: 0.97/1.038 # -1?
-  #    processes:
-  #    - ZH_hbb
-  #    - ZH_htt
-  #    - ZH_htononbb
-  #  - value: 0.005 # -1?
-  #    processes:
-  #    - WminusHToTauTau_M125
-  #    - WplusHToTauTau_M125
-  - name: QCDscale_VV
+  - name: BR_hbb
     type: lnN
-    value: 0.1
+    value: 0.0124
     processes:
-    - VV
-  - name: QCDscale_VVV
+    - ZH_Hbb_Zll
+    - ZH_Hbb_Zqq
+  - name: pdf_gg
     type: lnN
-    value: 0.1
-    processes:
-    - VVV
-  - name: QCDscale_tW
+    value: 0.042
+  - name: th_ggH
     type: lnN
-    value: 0.054
     processes:
-    - tW
-  #- name: alpha_s
-  #  type: lnN
-  #  value:
-  #  - value: 0.009
-  #    processes:
-  #    - ZH_Hbb_Zll
-  #    - ZH_Hbb_Zqq
-  #  - value: 0.026
-  #    processes:
-  #    - GluGluHToTauTau_M125
-  #  - value: 0.005
-  #    processes:
-  #    - VBFHToTauTau_M125
-  #  - value: 0.02
-  #    processes:
-  #    - ttH_hbb
-  - name: pdf_Higgs_gg
+    - ggH
+    value: 0.039
+  - name: th_qqH
+    type: lnN
+    processes:
+    - qqH
+    value: 0.004
+  - name: pdf_Higgs_ggH
     type: lnN
     value: 0.019
     processes:
-    - ggH_Htt
+    - ggH
     - GluGluToRadionToHHTo2B2Tau_M_${MX}
     - GluGluToBulkGravitonToHHTo2B2Tau_M_${MX}
+  - name: pdf_Higgs_ttH
+    type: lnN
+    value: 0.03
+    processes:
+    - ttH
+  - name: pdf_Higgs_tH
+    type: lnN
+    value: 0.047
+    processes:
+    - tH
+  - name: pdf_Higgs_qqH
+    type: lnN
+    value: 0.021 # 0.1
+    processes:
+    - qqH
+
   #- name: pdf_Higgs_qqbar
   #  type: lnN
   #  value:
@@ -245,27 +175,103 @@ uncertainties:
   #    processes:
   #    - WminusHToTauTau_M125
   #    - WplusHToTauTau_M125
-  - name: pdf_Higgs_ttH
+
+  - name: pdf_DY
     type: lnN
-    value: 0.03
+    value: 0.007296099203254119
     processes:
-    - ttH_Hbb
-  - name: pdf_Higgs_tH
+    - qqH
+
+  - name: QCDscale_VBF
     type: lnN
-    value: 0.047
-    processes:
-    - tH
-  - name: pdf_Higgs_qqbar
+    value: 0.004
+  - name: QCDscale_TT
     type: lnN
-    value: 0.1
+    value: [0.02458328336,-0.03597553663]
+  - name: QCDscale_DY
+    type: lnN
+    value: 0.02
+  # - name: QCDscale_V
+  #   type: lnN
+  #   value:
+  #   - value: 0.010209719408638887 # 0.008
+  #     processes:
+  #     - W
+  #   - value: 0.0015150713768754273 #0.02
+  #     processes:
+  #     - EWK_WminusToLNu
+  #     - EWK_WplusToLNu
+  #     - EWK_ZTo2L
+  #     - EWK_ZTo2Nu
+  # - name: QCDscale_VH
+  #   type: lnN
+  #   value:
+  #   - value: 0.038
+  #     processes:
+  #     - ZH_Hbb_Zll
+  #     - ZH_Hbb_Zqq
+  #     - ZHToTauTau_M125
+  #   - value: 0.005
+  #     processes:
+  #     - WminusHToTauTau_M125
+  #     - WplusHToTauTau_M125
+  #   - value: 0.016862949452840021
+  #     processes:
+  #     - HZJ_HToWW
+  - name: QCDscale_VV
+    type: lnN
+    value: 0.02509390849009717
     processes:
     - VV
+  - name: QCDscale_VVV
+    type: lnN
+    value: 0.0015074766057555197
+    processes:
+    - VVV
+  - name: QCDscale_tW
+    type: lnN
+    value: 0.054
+    processes:
+    - tW
   - name: QCDscale_singlet
     type: lnN
-    value: 0.94956353 # 0.978/1.0288
+    value: 0.043999532073744727
     processes:
-    - ST_tW_antitop_5f_InclusiveDecays
-    - ST_tW_top_5f_InclusiveDecays
+    - ST
+  # - name: alpha_s
+  #   type: lnN
+  #   value:
+  #   - value: 0.009 # ok!
+  #     processes:
+  #     - ZH_Hbb_Zll
+  #     - ZH_Hbb_Zqq
+  #     - ZHToTauTau
+  #   - value: 0.026 # ok
+  #     processes:
+  #     - GluGluHToTauTau_M125
+  #   - value: 0.005 # ok
+  #     processes:
+  #     - VBFHToTauTau_M125
+  #   - value: 0.02 # ok
+  #     processes:
+  #     - ttH
+  #   - value: 0.009 # ok!
+  #     processes:
+  #     - WplusHToTauTau
+  #     - WminusHToTauTau
+  #   - value: 0.02518287564
+  #     processes: TT
+
+
+  - name: TT_mass
+    type: lnN
+    processess: TT
+    value: [0.02782108166,-0.02698165247]
+  - name: DY_integration
+    type: lnN
+    processes: DY
+    value: 0.0007355336815188523
+
   - name: CMS_btag_HF
     type: auto
     categories:
@@ -418,18 +424,30 @@ uncertainties:
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_eff_j_PUJET_id_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_eff_j_PUJET_id_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_eff_j_PUJET_id_2018
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_eff_t_id_stat1_DM0_2018
     type: auto
     eras:
@@ -970,25 +988,42 @@ uncertainties:
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_res_j_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_res_j_2016
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_res_j_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_Abs
     type: auto
-    eras: ["2018", "2017", "2016", "2016_HIPM"]
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_Abs_2018
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_Abs_2017
     type: auto
     eras:
@@ -997,10 +1032,16 @@ uncertainties:
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_Abs_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_BBEC1
     type: auto
     eras: ["2018", "2017", "2016", "2016_HIPM"]
@@ -1008,78 +1049,134 @@ uncertainties:
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_BBEC1_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_BBEC1_2016
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_BBEC1_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_EC2
     type: auto
-    eras: ["2018", "2017", "2016", "2016_HIPM"]
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_EC2_2018
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_EC2_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_EC2_2016
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_EC2_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_FlavQCD
     type: auto
-    eras: ["2018", "2017", "2016", "2016_HIPM"]
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_HF
     type: auto
-    eras: ["2018", "2017", "2016", "2016_HIPM"]
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_HF_2018
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_HF_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_HF_2016
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_HF_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_RelBal
     type: auto
-    eras: ["2018", "2017", "2016", "2016_HIPM"]
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_RelSample_2018
     type: auto
     eras:
     - Run_2018
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_RelSample_2017
     type: auto
     eras:
     - Run_2017
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_RelSample_2016
     type: auto
     eras:
     - Run_2016
+    categories:
+    - res1b
+    - res2b
   - name: CMS_scale_j_RelSample_2016_HIPM
     type: auto
     eras:
     - Run_2016_HIPM
+    categories:
+    - res1b
+    - res2b
 
   #- name: CMS_eff_m_highpt_id_HighPtID_2018
   #  type: auto
