@@ -10,9 +10,9 @@ hist_bins:
   res2b: [245, 350, 450,600,750,1100,3505]
   boosted: [245,600,3505]
 eras:
-  #- Run_2018
+  - Run_2018
   #- Run_2017
-  #- Run_2016
+  - Run_2016
   - Run_2016_HIPM
 channels:
   #- eTau
