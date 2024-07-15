@@ -41,8 +41,6 @@ def rebinAndFill(new_hist, old_hist, epsilon=1e-7):
     old_max = old_axis.GetBinUpEdge(old_axis.GetNbins())
     new_min = new_axis.GetBinLowEdge(1)
     new_max = new_axis.GetBinUpEdge(new_axis.GetNbins())
-    #print(old_min, old_max)
-    #print(new_min, new_max)
     return old_min <= new_min and old_max >= new_max
 
   def get_new_bin(old_axis, new_axis, bin_id_old):
@@ -95,12 +93,6 @@ def rebinAndFill(new_hist, old_hist, epsilon=1e-7):
         bin_new = new_hist.GetBin(x_bin_new, y_bin_new)
         add_bin_content(bin_old, bin_new)
 
-def hasRelevantNegativeBins(histogram, relevant_bins = []):
-  for n in range(1, histogram.GetNbinsX() + 1):
-    if histogram.GetBinContent(n) < 0 and len(relevant_bins)>0 and relevant_bins[n] == True :
-      print(f"bin {n} is relevant for signals and has negative content")
-      return True
-  return False
 
 
 def th1ToNumpy(histogram, include_overflow=False):

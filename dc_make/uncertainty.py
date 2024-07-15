@@ -26,15 +26,7 @@ class Uncertainty:
     self.categories = categories
 
   def appliesTo(self, process, era, channel, category):
-    match_subprocesses = []
-    if process.subprocesses:
-      for subpr in process.subprocesses:
-        match_subprocesses.append(Uncertainty.hasMatch(subpr, process.subprocesses))
-    match_one_subpr=False
-    for item in match_subprocesses:
-      if item==True:
-        match_one_subpr=True
-        break
+    match_subprocess = any(map(lambda p: hasMatch(p, self.processes), process.subprocesses))
     return  (Uncertainty.hasMatch(process.name, self.processes) or match_one_subpr) \
         and Uncertainty.hasMatch(era, self.eras) \
         and Uncertainty.hasMatch(channel, self.channels) \
