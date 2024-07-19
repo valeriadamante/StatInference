@@ -87,6 +87,7 @@ class Uncertainty:
 
     if unc_type == UncertaintyType.lnN:
       value = entry["value"]
+      print(type(value))
       if type(value) in [ float, int ]:
         value = float(value)
       elif type(value) == list and len(value) == 2:

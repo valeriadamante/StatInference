@@ -7,9 +7,9 @@ model:
 hist_bins: /afs/cern.ch/work/v/vdamante/FLAF/StatInference/config/hhbbtautau_binning.json
 eras:
   #- Run_2018
-  - Run_2017
+  #- Run_2017
   - Run_2016
-  - Run_2016_HIPM
+  #- Run_2016_HIPM
 channels:
   #- eTau
   #- muTau
@@ -164,6 +164,12 @@ uncertainties:
     processes:
     - qqH
 
+  - name: PROVA
+    type: lnN
+    - value: 0.013
+      processes:
+      - ZH_Hbb_Zll
+      - ZH_Hbb_Zqq
   #- name: pdf_Higgs_qqbar
   #  type: lnN
   #  value:
