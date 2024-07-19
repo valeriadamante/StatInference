@@ -26,8 +26,8 @@ class Uncertainty:
     self.categories = categories
 
   def appliesTo(self, process, era, channel, category):
-    match_subprocess = any(map(lambda p: hasMatch(p, self.processes), process.subprocesses))
-    return  (Uncertainty.hasMatch(process.name, self.processes) or match_one_subpr) \
+    match_subprocess = any(map(lambda p: Uncertainty.hasMatch(p, self.processes), process.subprocesses)) if process.subprocesses else Uncertainty.hasMatch(process.name, self.processes)
+    return  (Uncertainty.hasMatch(process.name, self.processes) or match_subprocess) \
         and Uncertainty.hasMatch(era, self.eras) \
         and Uncertainty.hasMatch(channel, self.channels) \
         and Uncertainty.hasMatch(category, self.categories)

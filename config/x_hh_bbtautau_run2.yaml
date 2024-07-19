@@ -4,14 +4,10 @@ model:
   parameters: [ MX ]
   param_dependent_bkg: false
   input_file_pattern: ${ERA}.root
-hist_bins:
-  inclusive: [245, 350, 450,600,750,1250,3505]
-  res1b: [245, 350, 450,600,750,1250,3505]
-  res2b: [245, 350, 450,600,750,1100,3505]
-  boosted: [245,600,3505]
+hist_bins: /afs/cern.ch/work/v/vdamante/FLAF/StatInference/config/hhbbtautau_binning.json
 eras:
-  - Run_2018
-  #- Run_2017
+  #- Run_2018
+  - Run_2017
   - Run_2016
   - Run_2016_HIPM
 channels:
@@ -23,7 +19,7 @@ categories:
   - res2b
   - boosted
 processes:
-  - process: data_obs
+  - process: data
     is_data: true
     is_asimov_data: true
   - process: GluGluToRadionToHHTo2B2Tau_M_${MX}
@@ -35,11 +31,13 @@ processes:
   - process: TT
   - process: DY
   - process: VV
+    allow_zero_integral: True
     subprocesses:
     - WW
     - WZ
     - ZZ
   - process: ST
+    allow_zero_integral: True
     subprocesses:
     - ST_tW_antitop_5f_InclusiveDecays
     - ST_tW_top_5f_InclusiveDecays
@@ -47,19 +45,15 @@ processes:
     - ST_t-channel_top_4f_InclusiveDecays
   #- process: TW
   - process: TTX
+    allow_zero_integral: True
+    allow_negative_bins_within_error: True
+    max_n_sigma_for_negative_bins: 10
     subprocesses:
-    - TTWJetsToLNu
-    - TTWJetsToQQ
     - TTWW
     - TTWZ
     - TTWH
     - TTZH
-    - TTZToQQ
     - TTZZ
-    - TTZToNuNu
-    - TTGamma_Dilept
-    - TTGamma_Hadronic
-    - TTGamma_SingleLept
     - TTGG
     - TTWH
     - TTZH
@@ -69,43 +63,48 @@ processes:
     - TT4b
   - process: W
   - process: EWK
+    allow_zero_integral: True
     subprocesses:
     - EWK_WplusToLNu
     - EWK_WminusToLNu
     - EWK_ZTo2L
     - EWK_ZTo2Nu
   - process: VVV
+    allow_zero_integral: True
     subprocesses:
     - WWW_4F
     - WWZ_4F
     - WZZ
     - ZZZ
   - process: QCD
-  - process: ZJNuNu
+    allow_zero_integral: True
+    allow_negative_bins_within_error: True
+    max_n_sigma_for_negative_bins: 10
   - process: ggH
+    allow_zero_integral: True
     subprocesses:
     - GluGluHToTauTau_M125
     - ggHToZZTo2L2Q
     - GluGluHToWWTo2L2Nu_M125
   - process: qqH
+    allow_zero_integral: True
     subprocesses:
     - VBFHToTauTau_M125
     - VBFHToWWTo2L2Nu_M125
     - VBFHToWWTo2L2Nu_M125
   - process: VH
+    allow_zero_integral: True
     subprocesses:
-    - HZJ_HToWW_M125
-    - HWplusJ_HToWW_M125
-    - HWminusJ_HToWW_M125
-    - GluGluZH_HToWW_ZTo2L_M125
     - ZH_Hbb_Zll
     - ZH_Hbb_Zqq
     - WplusHToTauTau_M125
     - WminusHToTauTau_M125
     - ZHToTauTau_M125
   - process: ttH
+    allow_zero_integral: True
     subprocesses:
-    - ttH
+    - ttHTobb_M125
+    - ttHToTauTau_M125
 
 uncertainties:
   - name: lumi_13TeV
@@ -119,12 +118,16 @@ uncertainties:
     - ggH_htt
     - qqH_htt
     - VH_htt
+    - GluGluToRadionToHHTo2B2Tau*
+    - GluGluToBulkGravitonToHHTo2B2Tau*
   - name: BR_hbb
     type: lnN
     value: 0.0124
     processes:
     - ZH_Hbb_Zll
     - ZH_Hbb_Zqq
+    - GluGluToRadionToHHTo2B2Tau*
+    - GluGluToBulkGravitonToHHTo2B2Tau*
   - name: pdf_gg
     type: lnN
     value: 0.042
@@ -262,15 +265,6 @@ uncertainties:
   #   - value: 0.02518287564
   #     processes: TT
 
-
-  - name: TT_mass
-    type: lnN
-    processess: TT
-    value: [0.02782108166,-0.02698165247]
-  - name: DY_integration
-    type: lnN
-    processes: DY
-    value: 0.0007355336815188523
 
   - name: CMS_btag_HF
     type: auto

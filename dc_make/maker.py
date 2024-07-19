@@ -5,7 +5,7 @@ import yaml
 
 from CombineHarvester.CombineTools.ch import CombineHarvester
 
-from StatInference.common.tools import listToVector, rebinAndFill, importROOT,hasRelevantNegativeBins, resolveNegativeBins
+from StatInference.common.tools import listToVector, rebinAndFill, importROOT, resolveNegativeBins
 from .process import Process
 from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
 from .model import Model
@@ -32,7 +32,7 @@ class DatacardMaker:
       self.bins.append(bin)
 
     self.model = Model.fromConfig(cfg["model"])
-
+    print(self.model)
     self.param_bins = {}
     self.processes = {}
     data_process = None
@@ -80,8 +80,31 @@ class DatacardMaker:
     hist_bins = hist_bins or cfg.get("hist_bins", None)
     self.hist_binner = Binner(hist_bins)
 
+
+
+    """
+    self.hist_bins = hist_bins
+    if self.hist_bins is None:
+      self.hist_bins = cfg.get("hist_bins", None)
+    if self.hist_bins is not None:
+      self.hist_bins = listToVector(self.hist_bins, 'double')
+    """
+
     self.input_files = {}
     self.shapes = {}
+
+  def prepareHist(self,file,hist_name,process,bins):
+    hist = file.Get(hist_name)
+    if hist == None:
+      raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+    if bins is not None:
+      new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(bins) - 1, bins.data())
+      rebinAndFill(new_hist, hist)
+      hist = new_hist
+    hist.SetDirectory(0)
+    if process.scale != 1:
+      hist.Scale(process.scale)
+    return hist
 
   def getBin(self, era, channel, category, return_name=True, return_index=True):
     name = f'{era}_{self.analysis}_{channel}_{category}'
@@ -117,69 +140,6 @@ class DatacardMaker:
       self.input_files[file_name] = file
     return file_name, self.input_files[file_name]
 
-  def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
-    file_name, file = self.getInputFile(era, model_params)
-    key = (file_name, process.name, era, channel, category, unc_name, unc_scale)
-    if key not in self.shapes:
-      if process.is_data and (unc_name is not None or unc_scale is not None):
-        raise RuntimeError("Cannot apply uncertainty to the data process")
-      if process.is_asimov_data:
-        hist = None
-        for bkg_proc in self.processes.values():
-          if bkg_proc.is_background:
-            bkg_hist = self.getShape(bkg_proc, era, channel, category, model_params)
-            if hist is None:
-              hist = bkg_hist.Clone()
-            else:
-              hist.Add(bkg_hist)
-        if hist is None:
-          raise RuntimeError("Cannot create asimov data histogram")
-      else:
-        file = self.getInputFile(era, model_params)
-        hist_name = f"{channel}/{category}/{process.hist_name}"
-        hists = []
-        if process.subprocesses:
-          for subp in process.subprocesses:
-            hist_name = f"{channel}/{category}/{subp}"
-            if unc_name and unc_scale:
-              hist_name += f"_{unc_name}{unc_scale}"
-            #print(channel, category, subp, unc_name, unc_scale)
-            hists.append(self.prepareHist(file,hist_name,process,listToVector(self.hist_bins[category],'double')))
-        else:
-          #print(channel, category, process, unc_name, unc_scale)
-          hists.append(self.prepareHist(file,hist_name,process, listToVector(self.hist_bins[category],'double')))
-        hist = hists[0]
-        if len(hists)>1:
-          objsToMerge = ROOT.TList()
-          for histy in hists:
-            objsToMerge.Add(histy)
-          hist.Merge(objsToMerge)
-        hist.SetName(process.name)
-        hist.SetTitle(process.name)
-        if process.is_signal:
-          signal_processes_histograms.append(hist)
-        else:
-          relevant_bins = self.getRelevantBins(era, channel, category,signal_processes_histograms,unc_name, unc_scale, model_params)
-          allow_negative_bins_within_error = process.name not in ['TT', 'DY', 'W']
-          allow_zero_integral = process.name not in ['TT', 'DY', 'W'] or category=='boosted'
-          #print(allow_negative_bins_within_error)
-          isqcdboosted = process.name == 'QCD' and category=='boosted'
-
-          max_n_sigma_for_negative_bins = 10 if isqcdboosted or 'TT4b'in hist_name else 1
-          solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=allow_zero_integral, allow_negative_bins_within_error=allow_negative_bins_within_error, max_n_sigma_for_negative_bins=max_n_sigma_for_negative_bins, allow_negative_integral=isqcdboosted)
-
-          if not solution.accepted:
-            axis = hist.GetXaxis()
-            bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
-            bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
-            bin_errors = [ str(hist.GetBinError(n)) for n in range(1, axis.GetNbins() + 1)]
-            print(f'bins_edges: [ {", ".join(bins_edges)} ]')
-            print(f'bin_values: [ {", ".join(bin_values)} ]')
-            print(f'bin_errors: [ {", ".join(bin_errors)} ]')
-            raise RuntimeError(f"Negative bins found in histogram {hist_name}")
-      self.shapes[key] = hist
-    return self.shapes[key]
-
   def getRelevantBins(self, era, channel, category,signal_processes_histograms,unc_name=None, unc_scale=None, model_params=None):
     relevant_bins = []
     for hist in signal_processes_histograms:
@@ -196,9 +156,81 @@ class DatacardMaker:
             relevant_bins[nbin-1] = isImportant
     return relevant_bins
 
+  def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
+    file_name, file = self.getInputFile(era, model_params)
+    signal_processes_histograms = []
+    key = (file_name, process.name, era, channel, category, unc_name, unc_scale)
+    if key not in self.shapes:
+      if process.is_data and (unc_name is not None or unc_scale is not None):
+        raise RuntimeError("Cannot apply uncertainty to the data process")
+      if process.is_asimov_data:
+        hist = None
+        for bkg_proc in self.processes.values():
+          if bkg_proc.is_background:
+            bkg_hist = self.getShape(bkg_proc, era, channel, category, model_params)
+            if hist is None:
+              hist = bkg_hist.Clone()
+            else:
+              hist.Add(bkg_hist)
+        if hist is None:
+          raise RuntimeError("Cannot create asimov data histogram")
+      else:
+        hist_name = f"{channel}/{category}/{process.hist_name}"
+        hists = []
+        if process.subprocesses:
+          for subp in process.subprocesses:
+            hist_name = f"{channel}/{category}/{subp}"
+            if unc_name and unc_scale:
+              hist_name += f"_{unc_name}{unc_scale}"
+            subhist = file.Get(hist_name)
+            if subhist == None:
+              raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+            hists.append(self.hist_binner.applyBinning(era, channel, category, model_params, subhist))
+        else:
+          hist = file.Get(hist_name)
+          if hist == None:
+            raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+          hists.append(self.hist_binner.applyBinning(era, channel, category, model_params, hist))
+        if len(hists) == 0:
+          raise RuntimeError(f"hist list is empty for file {file.GetName()}")
+        hist = hists[0]
+        if len(hists)>1:
+          objsToMerge = ROOT.TList()
+          for histy in hists:
+            objsToMerge.Add(histy)
+          hist.Merge(objsToMerge)
+        hist.SetName(process.name)
+        hist.SetTitle(process.name)
+
+        hist.SetDirectory(0)
+        if process.scale != 1:
+          hist.Scale(process.scale)
+        if process.is_signal:
+            signal_processes_histograms.append(hist)
+        else:
+          relevant_bins = self.getRelevantBins(era, channel, category,signal_processes_histograms,unc_name, unc_scale, model_params)
+          solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=process.allow_zero_integral, allow_negative_bins_within_error=process.allow_negative_bins_within_error, max_n_sigma_for_negative_bins=process.max_n_sigma_for_negative_bins, allow_negative_integral=isqcdboosted)
+
+          if not solution.accepted:
+            axis = hist.GetXaxis()
+            bins_edges = [ str(axis.GetBinLowEdge(n)) for n in range(1, axis.GetNbins() + 2)]
+            bin_values = [ str(hist.GetBinContent(n)) for n in range(1, axis.GetNbins() + 1)]
+            bin_errors = [ str(hist.GetBinError(n)) for n in range(1, axis.GetNbins() + 1)]
+            print(f'bins_edges: [ {", ".join(bins_edges)} ]')
+            print(f'bin_values: [ {", ".join(bin_values)} ]')
+            print(f'bin_errors: [ {", ".join(bin_errors)} ]')
+            raise RuntimeError(f"Negative bins found in histogram {hist_name}")
+      self.shapes[key] = hist
+    return self.shapes[key]
+
+
+
+
   def addProcess(self, proc, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
     process = self.processes[proc]
+    print(process.name)
+    print(process.is_signal)
 
     def add(model_params, param_str):
       if process.is_data:
@@ -223,16 +255,21 @@ class DatacardMaker:
 
     if process.is_signal:
       model_params = process.params
+      print(f"process name is {process.name}")
+      print(model_params)
       param_str = self.model.paramStr(model_params)
       add(model_params, param_str)
     elif self.model.param_dependent_bkg:
+      print(f"process name is {process.name}")
       for signal_proc in self.processes.values():
         if signal_proc.is_signal:
           model_params = signal_proc.params
+          print(model_params)
           param_str = self.model.paramStr(model_params)
           add(model_params, param_str)
     else:
       add(None, "*")
+
 
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
@@ -252,9 +289,6 @@ class DatacardMaker:
           shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
                                             unc_name, unc_scale.name)
       unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
-      print("A")
-      print(unc_to_apply.name)
-      print(unc_to_apply.type)
       if unc_to_apply.canIgnore(self.ignorelnNThr):
         print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
         continue

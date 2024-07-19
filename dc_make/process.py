@@ -1,7 +1,7 @@
 from ..common.param_parse import extractParameters, applyParameters, parameterListToDict
 
 class Process:
-  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, subprocesses=None):
+  def __init__(self, name, hist_name, is_signal=False, is_data=False, is_asimov_data=False, scale=1, params=None, subprocesses=None, allow_zero_integral=False, allow_negative_bins_within_error=False, max_n_sigma_for_negative_bins=None):
     self.name = name
     self.hist_name = hist_name
     self.is_signal = is_signal
@@ -11,6 +11,9 @@ class Process:
     self.scale=scale
     self.params = params
     self.subprocesses = subprocesses
+    self.allow_zero_integral = allow_zero_integral
+    self.allow_negative_bins_within_error = allow_negative_bins_within_error
+    self.max_n_sigma_for_negative_bins = max_n_sigma_for_negative_bins
 
     if is_data and is_signal:
       raise RuntimeError("Data and signal flags cannot be set simultaneously")
@@ -56,6 +59,9 @@ class Process:
     is_asimov_data = entry.get("is_asimov_data", False)
     subprocesses = entry.get("subprocesses", [])
     scale = entry.get("scale", 1)
+    allow_zero_integral = entry.get("allow_zero_integral", False)
+    allow_negative_bins_within_error = entry.get("allow_negative_bins_within_error", False)
+    max_n_sigma_for_negative_bins = entry.get("max_n_sigma_for_negative_bins", 1)
     if type(scale) == str:
       scale = eval(scale)
     if 'param_values' not in entry:
