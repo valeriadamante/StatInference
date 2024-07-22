@@ -7,7 +7,7 @@ from CombineHarvester.CombineTools.ch import CombineHarvester
 
 from StatInference.common.tools import listToVector, rebinAndFill, importROOT, resolveNegativeBins
 from .process import Process
-from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale
+from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale, MultiValueLnNUncertainty
 from .model import Model
 from .binner import Binner
 ROOT = importROOT()
@@ -66,6 +66,7 @@ class DatacardMaker:
 
     self.uncertainties = {}
     for unc_entry in cfg["uncertainties"]:
+      print(unc_entry)
       unc = Uncertainty.fromConfig(unc_entry)
       if unc.name in self.uncertainties:
         raise RuntimeError(f"Uncertainty {unc.name} already exists")
@@ -94,18 +95,6 @@ class DatacardMaker:
     self.input_files = {}
     self.shapes = {}
 
-  def prepareHist(self,file,hist_name,process,bins):
-    hist = file.Get(hist_name)
-    if hist == None:
-      raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
-    if bins is not None:
-      new_hist = ROOT.TH1F(hist.GetName(), hist.GetTitle(), len(bins) - 1, bins.data())
-      rebinAndFill(new_hist, hist)
-      hist = new_hist
-    hist.SetDirectory(0)
-    if process.scale != 1:
-      hist.Scale(process.scale)
-    return hist
 
   def getBin(self, era, channel, category, return_name=True, return_index=True):
     name = f'{era}_{self.analysis}_{channel}_{category}'
@@ -273,7 +262,50 @@ class DatacardMaker:
     else:
       add(None, "*")
 
+  def addUncertainty(self, unc_name):
+    unc = self.uncertainties[unc_name]
+    for proc, param_str, era, channel, category in self.PPECC():
+      process = self.processes[proc]
+      if process.is_data: continue
+      isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
+      uncApplies = unc.getUncertaintyForProcess(process.name) not None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
+      if not uncApplies: continue
+      model_params = self.param_bins.get(param_str, None)
+      if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
+       if isMVLnUnc:
+         unc_value = unc.getUncertaintyForProcess(process.name)
+            if unc_value is None:
+                continue
+
+      nominal_shape = None
+      shapes = {}
+      if unc.needShapes:
+        model_params = self.param_bins.get(param_str, None)
+        nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
+        for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
+          shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
+                                            unc_name, unc_scale.name)
+      unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
+      if unc_to_apply.canIgnore(self.ignorelnNThr):
+        print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
+        continue
+      systMap = unc_to_apply.valueToMap(unc_value) if isMVLnUnc else unc_to_apply.valueToMap()
+      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
+      cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
+      if unc_to_apply.type == UncertaintyType.shape:
+        shape_set = False
+        def setShape(syst):
+          nonlocal shape_set
+          print(f"Setting unc shape for {syst}")
+          if shape_set:
+            raise RuntimeError("Shape already set")
+          syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
+          shape_set = True
+        cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
+        cb_copy.ForEachSyst(setShape)
+
+  '''
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
     for proc, param_str, era, channel, category in self.PPECC():
@@ -309,7 +341,7 @@ class DatacardMaker:
           shape_set = True
         cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
         cb_copy.ForEachSyst(setShape)
-
+  '''
   def writeDatacards(self, output):
     os.makedirs(output, exist_ok=True)
     background_names = [ proc_name for proc_name, proc in self.processes.items() if proc.is_background ]
