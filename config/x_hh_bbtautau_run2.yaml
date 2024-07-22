@@ -265,24 +265,30 @@ uncertainties:
     hasMultipleValues: True
     value:
     - value: 0.009 # ok!
+      type: lnN
       processes:
       - ZH_Hbb_Zll
       - ZH_Hbb_Zqq
       - ZHToTauTau
     - value: 0.026 # ok
+      type: lnN
       processes:
       - GluGluHToTauTau_M125
     - value: 0.005 # ok
+      type: lnN
       processes:
       - VBFHToTauTau_M125
     - value: 0.02 # ok
+      type: lnN
       processes:
       - ttH
     - value: 0.009 # ok!
+      type: lnN
       processes:
       - WplusHToTauTau
       - WminusHToTauTau
     - value: 0.02518287564
+      type: lnN
       processes: TT
 
 

@@ -262,48 +262,63 @@ class DatacardMaker:
     else:
       add(None, "*")
 
+  def addUncertainty_perProcess(self, unc, unc_name, process, param_str, era, channel, category, isMVLnUnc):
+    if isMVLnUnc :
+      print( unc.getUncertaintyForProcess(process.name))
+      print(f"unc applies for proc {proc} ? {uncApplies}" )
+    model_params = self.param_bins.get(param_str, None)
+    if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): return
+
+    if isMVLnUnc:
+      unc_value = unc.getUncertaintyForProcess(process.name)
+      if unc_value is None:
+          return
+
+    nominal_shape = None
+    shapes = {}
+    if unc.needShapes:
+      model_params = self.param_bins.get(param_str, None)
+      nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
+      for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
+        shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
+                                          unc_name, unc_scale.name)
+    unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
+    can_ignore = unc_to_apply.canIgnore(unc_value, self.ignorelnNThr) if isMVLnUnc else unc_to_apply.canIgnore(self.ignorelnNThr)
+    if can_ignore:
+      print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
+      return
+    systMap = unc_to_apply.valueToMap(unc_value) if isMVLnUnc else unc_to_apply.valueToMap()
+    cb_copy = self.cbCopy(param_str, proc, era, channel, category)
+    cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
+    if unc_to_apply.type == UncertaintyType.shape:
+      shape_set = False
+      def setShape(syst):
+        nonlocal shape_set
+        print(f"Setting unc shape for {syst}")
+        if shape_set:
+          raise RuntimeError("Shape already set")
+        syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
+        shape_set = True
+      cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
+      cb_copy.ForEachSyst(setShape)
+
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
+    print(f"unc name is {unc_name}")
+    isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
+    print(f"is MultiValued unc? {isMVLnUnc}")
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
       if process.is_data: continue
-      isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
-      uncApplies = unc.getUncertaintyForProcess(process.name) not None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
+      uncApplies = unc.getUncertaintyForProcess(process.name) != None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
       if not uncApplies: continue
-      model_params = self.param_bins.get(param_str, None)
-      if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
-       if isMVLnUnc:
-         unc_value = unc.getUncertaintyForProcess(process.name)
-            if unc_value is None:
-                continue
+      if process.subprocesses:
+        for subprocess in process.subprocesses:
+          self.addUncertainty_perProcess(unc,unc_name, subprocess, param_str, era, channel, category,isMVLnUnc)
+      else:
+        self.addUncertainty_perProcess(unc,unc_name, process, param_str, era, channel, category,isMVLnUnc)
 
-      nominal_shape = None
-      shapes = {}
-      if unc.needShapes:
-        model_params = self.param_bins.get(param_str, None)
-        nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
-        for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
-          shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
-                                            unc_name, unc_scale.name)
-      unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
-      if unc_to_apply.canIgnore(self.ignorelnNThr):
-        print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
-        continue
-      systMap = unc_to_apply.valueToMap(unc_value) if isMVLnUnc else unc_to_apply.valueToMap()
-      cb_copy = self.cbCopy(param_str, proc, era, channel, category)
-      cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
-      if unc_to_apply.type == UncertaintyType.shape:
-        shape_set = False
-        def setShape(syst):
-          nonlocal shape_set
-          print(f"Setting unc shape for {syst}")
-          if shape_set:
-            raise RuntimeError("Shape already set")
-          syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
-          shape_set = True
-        cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
-        cb_copy.ForEachSyst(setShape)
 
   '''
   def addUncertainty(self, unc_name):
