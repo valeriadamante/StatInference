@@ -47,6 +47,7 @@ class DatacardMaker:
         if process.name in self.processes:
           raise RuntimeError(f"Process name {process.name} already exists")
         print(f"Adding {process}")
+        print(f"process allows zero integral? {process.allow_zero_integral}")
         self.processes[process.name] = process
         if process.is_data:
           if data_process is not None:
@@ -195,10 +196,11 @@ class DatacardMaker:
           raise RuntimeError(f"hist list is empty for file {file.GetName()}")
         hist = hists[0]
         if len(hists)>1:
-          objsToMerge = ROOT.TList()
-          for histy in hists:
-            objsToMerge.Add(histy)
-          hist.Merge(objsToMerge)
+          #objsToMerge = ROOT.TList()
+          for histy in hists[1:]:
+            hist.Add(histy)
+            #objsToMerge.Add(histy)
+          #hist.Merge(objsToMerge)
         hist.SetName(process.name)
         hist.SetTitle(process.name)
 
@@ -209,7 +211,8 @@ class DatacardMaker:
             signal_processes_histograms.append(hist)
         else:
           relevant_bins = self.getRelevantBins(era, channel, category,signal_processes_histograms,unc_name, unc_scale, model_params)
-          solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=process.allow_zero_integral, allow_negative_bins_within_error=process.allow_negative_bins_within_error, max_n_sigma_for_negative_bins=process.max_n_sigma_for_negative_bins, allow_negative_integral=isqcdboosted)
+          #if process.name == 'VVV' : print(f"process name is VVV and allow neg bins error is {process.allow_negative_bins_within_error} and allow_zero_integral is {process.allow_zero_integral}")
+          solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=process.allow_zero_integral, allow_negative_bins_within_error=process.allow_negative_bins_within_error, max_n_sigma_for_negative_bins=process.max_n_sigma_for_negative_bins, allow_negative_integral=process.allow_negative_integral)
 
           if not solution.accepted:
             axis = hist.GetXaxis()
@@ -229,8 +232,8 @@ class DatacardMaker:
   def addProcess(self, proc, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
     process = self.processes[proc]
-    print(process.name)
-    print(process.is_signal)
+    #print(process.name)
+    #print(process.is_signal)
 
     def add(model_params, param_str):
       if process.is_data:
@@ -256,7 +259,7 @@ class DatacardMaker:
     if process.is_signal:
       model_params = process.params
       print(f"process name is {process.name}")
-      print(model_params)
+      print(f"model_params is {model_params}")
       param_str = self.model.paramStr(model_params)
       add(model_params, param_str)
     elif self.model.param_dependent_bkg:

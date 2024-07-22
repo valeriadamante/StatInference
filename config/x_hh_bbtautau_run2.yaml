@@ -32,12 +32,14 @@ processes:
   - process: DY
   - process: VV
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - WW
     - WZ
     - ZZ
   - process: ST
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - ST_tW_antitop_5f_InclusiveDecays
     - ST_tW_top_5f_InclusiveDecays
@@ -64,6 +66,7 @@ processes:
   - process: W
   - process: EWK
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - EWK_WplusToLNu
     - EWK_WminusToLNu
@@ -71,6 +74,8 @@ processes:
     - EWK_ZTo2Nu
   - process: VVV
     allow_zero_integral: True
+    max_n_sigma_for_negative_bins: 1.01
+    allow_negative_bins_within_error: True
     subprocesses:
     - WWW_4F
     - WWZ_4F
@@ -78,22 +83,26 @@ processes:
     - ZZZ
   - process: QCD
     allow_zero_integral: True
+    allow_negative_integral: True
     allow_negative_bins_within_error: True
     max_n_sigma_for_negative_bins: 10
   - process: ggH
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - GluGluHToTauTau_M125
     - ggHToZZTo2L2Q
     - GluGluHToWWTo2L2Nu_M125
   - process: qqH
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - VBFHToTauTau_M125
     - VBFHToWWTo2L2Nu_M125
     - VBFHToWWTo2L2Nu_M125
   - process: VH
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - ZH_Hbb_Zll
     - ZH_Hbb_Zqq
@@ -102,6 +111,7 @@ processes:
     - ZHToTauTau_M125
   - process: ttH
     allow_zero_integral: True
+    allow_negative_bins_within_error: True
     subprocesses:
     - ttHTobb_M125
     - ttHToTauTau_M125
@@ -164,26 +174,25 @@ uncertainties:
     processes:
     - qqH
 
-  - name: PROVA
+
+  - name: pdf_Higgs_qqbar
     type: lnN
+    hasMultipleValues: True
+    value:
     - value: 0.013
+      type: lnN
       processes:
       - ZH_Hbb_Zll
       - ZH_Hbb_Zqq
-  #- name: pdf_Higgs_qqbar
-  #  type: lnN
-  #  value:
-  #  - value: 0.013
-  #    processes:
-  #    - ZH_Hbb_Zll
-  #    - ZH_Hbb_Zqq
-  #  - value: 0.021
-  #    processes:
-  #    - VBFHToTauTau_M125
-  #  - value: 0.017
-  #    processes:
-  #    - WminusHToTauTau_M125
-  #    - WplusHToTauTau_M125
+    - value: 0.021
+      type: lnN
+      processes:
+      - VBFHToTauTau_M125
+    - value: 0.017
+      type: lnN
+      processes:
+      - WminusHToTauTau_M125
+      - WplusHToTauTau_M125
 
   - name: pdf_DY
     type: lnN
@@ -200,33 +209,37 @@ uncertainties:
   - name: QCDscale_DY
     type: lnN
     value: 0.02
-  # - name: QCDscale_V
-  #   type: lnN
-  #   value:
-  #   - value: 0.010209719408638887 # 0.008
-  #     processes:
-  #     - W
-  #   - value: 0.0015150713768754273 #0.02
-  #     processes:
-  #     - EWK_WminusToLNu
-  #     - EWK_WplusToLNu
-  #     - EWK_ZTo2L
-  #     - EWK_ZTo2Nu
-  # - name: QCDscale_VH
-  #   type: lnN
-  #   value:
-  #   - value: 0.038
-  #     processes:
-  #     - ZH_Hbb_Zll
-  #     - ZH_Hbb_Zqq
-  #     - ZHToTauTau_M125
-  #   - value: 0.005
-  #     processes:
-  #     - WminusHToTauTau_M125
-  #     - WplusHToTauTau_M125
-  #   - value: 0.016862949452840021
-  #     processes:
-  #     - HZJ_HToWW
+  - name: QCDscale_V
+    hasMultipleValues: True
+    type: lnN
+
+    hasMultipleValues: True
+    value:
+    - value: 0.010209719408638887 # 0.008
+      processes:
+      - W
+    - value: 0.0015150713768754273 #0.02
+      processes:
+      - EWK_WminusToLNu
+      - EWK_WplusToLNu
+      - EWK_ZTo2L
+      - EWK_ZTo2Nu
+  - name: QCDscale_VH
+    hasMultipleValues: True
+    type: lnN
+    value:
+    - value: 0.038
+      processes:
+      - ZH_Hbb_Zll
+      - ZH_Hbb_Zqq
+      - ZHToTauTau_M125
+    - value: 0.005
+      processes:
+      - WminusHToTauTau_M125
+      - WplusHToTauTau_M125
+    - value: 0.016862949452840021
+      processes:
+      - HZJ_HToWW
   - name: QCDscale_VV
     type: lnN
     value: 0.02509390849009717
@@ -247,29 +260,30 @@ uncertainties:
     value: 0.043999532073744727
     processes:
     - ST
-  # - name: alpha_s
-  #   type: lnN
-  #   value:
-  #   - value: 0.009 # ok!
-  #     processes:
-  #     - ZH_Hbb_Zll
-  #     - ZH_Hbb_Zqq
-  #     - ZHToTauTau
-  #   - value: 0.026 # ok
-  #     processes:
-  #     - GluGluHToTauTau_M125
-  #   - value: 0.005 # ok
-  #     processes:
-  #     - VBFHToTauTau_M125
-  #   - value: 0.02 # ok
-  #     processes:
-  #     - ttH
-  #   - value: 0.009 # ok!
-  #     processes:
-  #     - WplusHToTauTau
-  #     - WminusHToTauTau
-  #   - value: 0.02518287564
-  #     processes: TT
+  - name: alpha_s
+    type: lnN
+    hasMultipleValues: True
+    value:
+    - value: 0.009 # ok!
+      processes:
+      - ZH_Hbb_Zll
+      - ZH_Hbb_Zqq
+      - ZHToTauTau
+    - value: 0.026 # ok
+      processes:
+      - GluGluHToTauTau_M125
+    - value: 0.005 # ok
+      processes:
+      - VBFHToTauTau_M125
+    - value: 0.02 # ok
+      processes:
+      - ttH
+    - value: 0.009 # ok!
+      processes:
+      - WplusHToTauTau
+      - WminusHToTauTau
+    - value: 0.02518287564
+      processes: TT
 
 
   - name: CMS_btag_HF
