@@ -159,7 +159,7 @@ class DatacardMaker:
         if subhist == None:
           raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
         axis = subhist.GetXaxis()
-        hist_integral = subhist.Integral(1,axis.GetNbins() + 1)
+        yield_subproc = subhist.Integral(1,axis.GetNbins() + 1)
         unc_value = unc.getUncertaintyForProcess(subp)
         #print(f"got {unc_name} for {subp} with yield {yield_subproc} and it's {unc_value}")
         if unc_value != None:
