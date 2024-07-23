@@ -6,10 +6,10 @@ model:
   input_file_pattern: ${ERA}.root
 hist_bins: /afs/cern.ch/work/v/vdamante/FLAF/StatInference/config/hhbbtautau_binning.json
 eras:
-  #- Run_2018
-  #- Run_2017
+  - Run_2018
+  - Run_2017
   - Run_2016
-  #- Run_2016_HIPM
+  - Run_2016_HIPM
 channels:
   #- eTau
   #- muTau
