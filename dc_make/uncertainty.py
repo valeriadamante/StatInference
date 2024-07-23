@@ -107,10 +107,7 @@ class Uncertainty:
           for key in ["processes", "eras", "channels", "categories"]:
             args[key] = getPatternList(key,sub_entry)
           multi_values[key_value] = sub_entry["value"]
-          #print(sub_entry)
-        #print("multi_values")
-        #print(multi_values)
-        unc = MultiValueLnNUncertainty(name, multi_values)# **args)
+        unc = MultiValueLnNUncertainty(name, multi_values)
         unc.checkValue()
       elif isinstance(value, list) and len(value) == 2:
         value = {UncertaintyScale.Down: value[0], UncertaintyScale.Up: value[1]}
@@ -189,9 +186,7 @@ class LnNUncertainty(Uncertainty):
 class MultiValueLnNUncertainty(Uncertainty):
   def __init__(self, name, values):
       self.name = name
-      #print(name)
       self.values = values
-      #print(values)
 
   @property
   def type(self):
