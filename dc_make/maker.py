@@ -47,7 +47,6 @@ class DatacardMaker:
         if process.name in self.processes:
           raise RuntimeError(f"Process name {process.name} already exists")
         print(f"Adding {process}")
-        #print(f"process allows zero integral? {process.allow_zero_integral}")
         self.processes[process.name] = process
         if process.is_data:
           if data_process is not None:
@@ -66,7 +65,6 @@ class DatacardMaker:
 
     self.uncertainties = {}
     for unc_entry in cfg["uncertainties"]:
-      #print(unc_entry)
       unc = Uncertainty.fromConfig(unc_entry)
       if unc.name in self.uncertainties:
         raise RuntimeError(f"Uncertainty {unc.name} already exists")
@@ -135,7 +133,6 @@ class DatacardMaker:
     for hist in signal_processes_histograms:
         axis = hist.GetXaxis()
         hist_integral = hist.Integral(1,axis.GetNbins() + 1)
-        #print(axis.GetNbins())
         for nbin in range(1,axis.GetNbins() + 1):
           isImportant=False
           if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= 0.2:
@@ -149,7 +146,6 @@ class DatacardMaker:
   def getMultiValueLnUnc(self,unc,unc_name, process, era, channel, category, model_params):#, unc_name=None, unc_scale=None)
     file_name, file = self.getInputFile(era, model_params)
     hist_name = f"{channel}/{category}/{process.hist_name}"
-    #print(unc.getUncertaintyForProcess(process.name))
     if unc.getUncertaintyForProcess(process.name) != None:
       return unc.getUncertaintyForProcess(process.name)
     elif process.subprocesses:
@@ -157,19 +153,17 @@ class DatacardMaker:
       unc_value_tot = 0.
       yield_value_tot = 1.
       for subp in process.subprocesses:
-        #print(f"subprocess is {subp}")
         hist_name = f"{channel}/{category}/{subp}"
         subhist = file.Get(hist_name)
-        #print(f"hist name is {hist_name}")
         #newhist = self.hist_binner.applyBinning(era, channel, category, model_params, subhist)
         if subhist == None:
           raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
-        yield_subproc = subhist.Integral(0,subhist.GetNbinsX()+1)
-        #print(yield_subproc)
+        axis = subhist.GetXaxis()
+        hist_integral = subhist.Integral(1,axis.GetNbins() + 1)
         unc_value = unc.getUncertaintyForProcess(subp)
-        #print(f"got {unc_name} for {subp} and it's {unc_value}")
+        #print(f"got {unc_name} for {subp} with yield {yield_subproc} and it's {unc_value}")
         if unc_value != None:
-          #print(unc_value)
+          if yield_subproc == 0 : continue
           unc_value_tot+=unc_value*yield_subproc
           yield_value_tot*=yield_subproc
       if unc_value_tot != 0.:
@@ -233,7 +227,6 @@ class DatacardMaker:
             signal_processes_histograms.append(hist)
         else:
           relevant_bins = self.getRelevantBins(era, channel, category,signal_processes_histograms,unc_name, unc_scale, model_params)
-          #if process.name == 'VVV' : print(f"process name is VVV and allow neg bins error is {process.allow_negative_bins_within_error} and allow_zero_integral is {process.allow_zero_integral}")
           solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=process.allow_zero_integral, allow_negative_bins_within_error=process.allow_negative_bins_within_error, max_n_sigma_for_negative_bins=process.max_n_sigma_for_negative_bins, allow_negative_integral=process.allow_negative_integral)
 
           if not solution.accepted:
@@ -254,9 +247,6 @@ class DatacardMaker:
   def addProcess(self, proc, era, channel, category):
     bin_idx, bin_name = self.getBin(era, channel, category)
     process = self.processes[proc]
-    #print(process.name)
-    #print(process.is_signal)
-
     def add(model_params, param_str):
       if process.is_data:
         self.cb.AddObservations([param_str], [self.analysis], [era], [channel], [(bin_idx, bin_name)])
@@ -280,16 +270,12 @@ class DatacardMaker:
 
     if process.is_signal:
       model_params = process.params
-      #print(f"process name is {process.name}")
-      #print(f"model_params is {model_params}")
       param_str = self.model.paramStr(model_params)
       add(model_params, param_str)
     elif self.model.param_dependent_bkg:
-      #print(f"process name is {process.name}")
       for signal_proc in self.processes.values():
         if signal_proc.is_signal:
           model_params = signal_proc.params
-          #print(model_params)
           param_str = self.model.paramStr(model_params)
           add(model_params, param_str)
     else:
@@ -299,20 +285,12 @@ class DatacardMaker:
     unc = self.uncertainties[unc_name]
     #print(f"unc name is {unc_name}")
     isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
-    #print(f"is MultiValued unc? {isMVLnUnc}")
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
       if process.is_data: continue
-      #print(f"has {process.name} subprocesses? {process.subprocesses}")
-      #print(f"is {unc_name} MultiValued unc? {isMVLnUnc}")
       model_params = self.param_bins.get(param_str, None)
-      #print(f"model params {model_params}")
       if isMVLnUnc:
-        #print("getMultiValueLnUnc")
         unc_value = self.getMultiValueLnUnc(unc,unc_name,process, era, channel, category, model_params)#, unc_name=None, unc_scale=None
-        #print(f"the MVLnUnc is {unc_value}")
-        #if unc_value is None:
-        #    continue
 
       uncApplies = unc_value != None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
       #print(f"unc applies? {uncApplies}")

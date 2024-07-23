@@ -215,8 +215,6 @@ class MultiValueLnNUncertainty(Uncertainty):
 
   def checkValue(self):
       for key in self.values.keys():
-          #if 'value' not in entry or 'processes' not in entry:
-          #    raise ValueError(f"Invalid entry in values: {entry}. Must contain 'value' and 'processes'.")
         processes, eras, channels, categories = key
         value = self.values[key]
         if not isinstance(value, (int, float)):
@@ -229,7 +227,7 @@ class MultiValueLnNUncertainty(Uncertainty):
       processes, eras, channels, categories = key
       if process in processes:
         return self.values[key]
-      return None
+    return None
 
   def valueToMap(self, unc_value, digits=3):
     if type(unc_value) == float:
