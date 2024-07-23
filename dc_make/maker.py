@@ -32,7 +32,7 @@ class DatacardMaker:
       self.bins.append(bin)
 
     self.model = Model.fromConfig(cfg["model"])
-    print(self.model)
+    #print(self.model)
     self.param_bins = {}
     self.processes = {}
     data_process = None
@@ -47,7 +47,7 @@ class DatacardMaker:
         if process.name in self.processes:
           raise RuntimeError(f"Process name {process.name} already exists")
         print(f"Adding {process}")
-        print(f"process allows zero integral? {process.allow_zero_integral}")
+        #print(f"process allows zero integral? {process.allow_zero_integral}")
         self.processes[process.name] = process
         if process.is_data:
           if data_process is not None:
@@ -66,7 +66,7 @@ class DatacardMaker:
 
     self.uncertainties = {}
     for unc_entry in cfg["uncertainties"]:
-      print(unc_entry)
+      #print(unc_entry)
       unc = Uncertainty.fromConfig(unc_entry)
       if unc.name in self.uncertainties:
         raise RuntimeError(f"Uncertainty {unc.name} already exists")
@@ -145,6 +145,39 @@ class DatacardMaker:
           else:
             relevant_bins[nbin-1] = isImportant
     return relevant_bins
+
+  def getMultiValueLnUnc(self,unc,unc_name, process, era, channel, category, model_params):#, unc_name=None, unc_scale=None)
+    file_name, file = self.getInputFile(era, model_params)
+    hist_name = f"{channel}/{category}/{process.hist_name}"
+    #print(unc.getUncertaintyForProcess(process.name))
+    if unc.getUncertaintyForProcess(process.name) != None:
+      return unc.getUncertaintyForProcess(process.name)
+    elif process.subprocesses:
+      #print(f"process has {process.subprocesses}")
+      unc_value_tot = 0.
+      yield_value_tot = 1.
+      for subp in process.subprocesses:
+        #print(f"subprocess is {subp}")
+        hist_name = f"{channel}/{category}/{subp}"
+        subhist = file.Get(hist_name)
+        #print(f"hist name is {hist_name}")
+        #newhist = self.hist_binner.applyBinning(era, channel, category, model_params, subhist)
+        if subhist == None:
+          raise RuntimeError(f"Cannot find histogram {hist_name} in {file.GetName()}")
+        yield_subproc = subhist.Integral(0,subhist.GetNbinsX()+1)
+        #print(yield_subproc)
+        unc_value = unc.getUncertaintyForProcess(subp)
+        #print(f"got {unc_name} for {subp} and it's {unc_value}")
+        if unc_value != None:
+          #print(unc_value)
+          unc_value_tot+=unc_value*yield_subproc
+          yield_value_tot*=yield_subproc
+      if unc_value_tot != 0.:
+        return unc_value_tot/yield_value_tot
+      return None
+    return None
+    #  uAB = ( uA * A + uB * B ) / AB
+
 
   def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
     file_name, file = self.getInputFile(era, model_params)
@@ -247,88 +280,45 @@ class DatacardMaker:
 
     if process.is_signal:
       model_params = process.params
-      print(f"process name is {process.name}")
-      print(f"model_params is {model_params}")
+      #print(f"process name is {process.name}")
+      #print(f"model_params is {model_params}")
       param_str = self.model.paramStr(model_params)
       add(model_params, param_str)
     elif self.model.param_dependent_bkg:
-      print(f"process name is {process.name}")
+      #print(f"process name is {process.name}")
       for signal_proc in self.processes.values():
         if signal_proc.is_signal:
           model_params = signal_proc.params
-          print(model_params)
+          #print(model_params)
           param_str = self.model.paramStr(model_params)
           add(model_params, param_str)
     else:
       add(None, "*")
 
-  def addUncertainty_perProcess(self, unc, unc_name, process, param_str, era, channel, category, isMVLnUnc):
-    if isMVLnUnc :
-      print( unc.getUncertaintyForProcess(process.name))
-      print(f"unc applies for proc {proc} ? {uncApplies}" )
-    model_params = self.param_bins.get(param_str, None)
-    if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): return
-
-    if isMVLnUnc:
-      unc_value = unc.getUncertaintyForProcess(process.name)
-      if unc_value is None:
-          return
-
-    nominal_shape = None
-    shapes = {}
-    if unc.needShapes:
-      model_params = self.param_bins.get(param_str, None)
-      nominal_shape = self.getShape(self.processes[proc], era, channel, category, model_params)
-      for unc_scale in [ UncertaintyScale.Up, UncertaintyScale.Down ]:
-        shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
-                                          unc_name, unc_scale.name)
-    unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
-    can_ignore = unc_to_apply.canIgnore(unc_value, self.ignorelnNThr) if isMVLnUnc else unc_to_apply.canIgnore(self.ignorelnNThr)
-    if can_ignore:
-      print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
-      return
-    systMap = unc_to_apply.valueToMap(unc_value) if isMVLnUnc else unc_to_apply.valueToMap()
-    cb_copy = self.cbCopy(param_str, proc, era, channel, category)
-    cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
-    if unc_to_apply.type == UncertaintyType.shape:
-      shape_set = False
-      def setShape(syst):
-        nonlocal shape_set
-        print(f"Setting unc shape for {syst}")
-        if shape_set:
-          raise RuntimeError("Shape already set")
-        syst.set_shapes(shapes[UncertaintyScale.Up], shapes[UncertaintyScale.Down], nominal_shape)
-        shape_set = True
-      cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
-      cb_copy.ForEachSyst(setShape)
-
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
-    print(f"unc name is {unc_name}")
+    #print(f"unc name is {unc_name}")
     isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
-    print(f"is MultiValued unc? {isMVLnUnc}")
+    #print(f"is MultiValued unc? {isMVLnUnc}")
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
       if process.is_data: continue
-      uncApplies = unc.getUncertaintyForProcess(process.name) != None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
-      if not uncApplies: continue
-
-      if process.subprocesses:
-        for subprocess in process.subprocesses:
-          self.addUncertainty_perProcess(unc,unc_name, subprocess, param_str, era, channel, category,isMVLnUnc)
-      else:
-        self.addUncertainty_perProcess(unc,unc_name, process, param_str, era, channel, category,isMVLnUnc)
-
-
-  '''
-  def addUncertainty(self, unc_name):
-    unc = self.uncertainties[unc_name]
-    for proc, param_str, era, channel, category in self.PPECC():
-      process = self.processes[proc]
-      if process.is_data: continue
-      if not unc.appliesTo(process, era, channel, category): continue
+      #print(f"has {process.name} subprocesses? {process.subprocesses}")
+      #print(f"is {unc_name} MultiValued unc? {isMVLnUnc}")
       model_params = self.param_bins.get(param_str, None)
+      #print(f"model params {model_params}")
+      if isMVLnUnc:
+        #print("getMultiValueLnUnc")
+        unc_value = self.getMultiValueLnUnc(unc,unc_name,process, era, channel, category, model_params)#, unc_name=None, unc_scale=None
+        #print(f"the MVLnUnc is {unc_value}")
+        #if unc_value is None:
+        #    continue
+
+      uncApplies = unc_value != None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
+      #print(f"unc applies? {uncApplies}")
+      if not uncApplies: continue
       if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
+
 
       nominal_shape = None
       shapes = {}
@@ -339,10 +329,11 @@ class DatacardMaker:
           shapes[unc_scale] = self.getShape(self.processes[proc], era, channel, category, model_params,
                                             unc_name, unc_scale.name)
       unc_to_apply = unc.resolveType(nominal_shape, shapes, self.autolnNThr, self.asymlnNThr)
-      if unc_to_apply.canIgnore(self.ignorelnNThr):
+      can_ignore = unc_to_apply.canIgnore(unc_value, self.ignorelnNThr) if isMVLnUnc else unc_to_apply.canIgnore(self.ignorelnNThr)
+      if can_ignore:
         print(f"Ignoring uncertainty {unc_name} for {proc} in {era} {channel} {category}")
         continue
-      systMap = unc_to_apply.valueToMap()
+      systMap = unc_to_apply.valueToMap(unc_value) if isMVLnUnc else unc_to_apply.valueToMap()
       cb_copy = self.cbCopy(param_str, proc, era, channel, category)
       cb_copy.AddSyst(self.cb, unc_name, unc_to_apply.type.name, systMap)
       if unc_to_apply.type == UncertaintyType.shape:
@@ -356,7 +347,7 @@ class DatacardMaker:
           shape_set = True
         cb_copy = self.cbCopy(param_str, proc, era, channel, category).syst_name([unc_name])
         cb_copy.ForEachSyst(setShape)
-  '''
+
   def writeDatacards(self, output):
     os.makedirs(output, exist_ok=True)
     background_names = [ proc_name for proc_name, proc in self.processes.items() if proc.is_background ]
