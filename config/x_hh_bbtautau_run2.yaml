@@ -18,8 +18,9 @@ categories:
   - res1b
   - res2b
   - boosted
+integral_threshold: 0.2
 processes:
-  - process: data
+  - process: data_obs
     is_data: true
     is_asimov_data: true
   - process: GluGluToRadionToHHTo2B2Tau_M_${MX}
@@ -99,7 +100,6 @@ processes:
     subprocesses:
     - VBFHToTauTau_M125
     - VBFHToWWTo2L2Nu_M125
-    - VBFHToWWTo2L2Nu_M125
   - process: VH
     allow_zero_integral: True
     allow_negative_bins_within_error: True
@@ -156,8 +156,6 @@ uncertainties:
     value: 0.019
     processes:
     - ggH
-    - GluGluToRadionToHHTo2B2Tau_M_${MX}
-    - GluGluToBulkGravitonToHHTo2B2Tau_M_${MX}
   - name: pdf_Higgs_ttH
     type: lnN
     value: 0.03
@@ -198,21 +196,26 @@ uncertainties:
     type: lnN
     value: 0.007296099203254119
     processes:
-    - qqH
+    - DY
 
   - name: QCDscale_VBF
     type: lnN
     value: 0.004
+    processes:
+    - qqH
   - name: QCDscale_TT
     type: lnN
+    processes:
+    - TT
     value: [0.02458328336,-0.03597553663]
   - name: QCDscale_DY
     type: lnN
+    processes:
+    - DY
     value: 0.02
   - name: QCDscale_V
     hasMultipleValues: True
     type: lnN
-
     hasMultipleValues: True
     value:
     - value: 0.010209719408638887 # 0.008
@@ -790,44 +793,44 @@ uncertainties:
     type: auto
     eras:
     - Run_2016_HIPM
-  #- name: CMS_eff_t_id_stat_highpT_bin1_2018
-  #  type: auto
-  #  eras:
-  #  - Run_2018
-  #- name: CMS_eff_t_id_stat_highpT_bin1_2017
-  #  type: auto
-  #  eras:
-  #  - Run_2017
-  #- name: CMS_eff_t_id_stat_highpT_bin1_2016
-  #  type: auto
-  #  eras:
-  #  - Run_2016
-  #- name: CMS_eff_t_id_stat_highpT_bin1_2016_HIPM
-  #  type: auto
-  #  eras:
-  #  - Run_2016_HIPM
-  #- name: CMS_eff_t_id_stat_highpT_bin2_2018
-  #  type: auto
-  #  eras:
-  #  - Run_2018
-  #- name: CMS_eff_t_id_stat_highpT_bin2_2017
-  #  type: auto
-  #  eras:
-  #  - Run_2017
-  #- name: CMS_eff_t_id_stat_highpT_bin2_2016
-  #  type: auto
-  #  eras:
-  #  - Run_2016
-  #- name: CMS_eff_t_id_stat_highpT_bin2_2016_HIPM
-  #  type: auto
-  #  eras:
-  #  - Run_2016_HIPM
-  #- name: CMS_eff_t_id_syst_highpT_bin1
-  #  type: auto
-  #- name: CMS_eff_t_id_syst_highpT_bin2
-  #  type: auto
-  #- name: CMS_eff_t_id_syst_highpT_extrap
-  #  type: auto
+  - name: CMS_eff_t_id_stat_highpT_bin1_2018
+    type: auto
+    eras:
+    - Run_2018
+  - name: CMS_eff_t_id_stat_highpT_bin1_2017
+    type: auto
+    eras:
+    - Run_2017
+  - name: CMS_eff_t_id_stat_highpT_bin1_2016
+    type: auto
+    eras:
+    - Run_2016
+  - name: CMS_eff_t_id_stat_highpT_bin1_2016_HIPM
+    type: auto
+    eras:
+    - Run_2016_HIPM
+  - name: CMS_eff_t_id_stat_highpT_bin2_2018
+    type: auto
+    eras:
+    - Run_2018
+  - name: CMS_eff_t_id_stat_highpT_bin2_2017
+    type: auto
+    eras:
+    - Run_2017
+  - name: CMS_eff_t_id_stat_highpT_bin2_2016
+    type: auto
+    eras:
+    - Run_2016
+  - name: CMS_eff_t_id_stat_highpT_bin2_2016_HIPM
+    type: auto
+    eras:
+    - Run_2016_HIPM
+  - name: CMS_eff_t_id_syst_highpT_bin1
+    type: auto
+  - name: CMS_eff_t_id_syst_highpT_bin2
+    type: auto
+  - name: CMS_eff_t_id_syst_highpT_extrap
+    type: auto
   - name: CMS_l1_prefiring_2017
     type: auto
     eras:

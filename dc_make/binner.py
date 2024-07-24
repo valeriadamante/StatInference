@@ -9,7 +9,6 @@ class Binner:
             #Load json
             with open(hist_bins) as f:
                 self.hist_bins = json.load(f)
-                #print(self.hist_bins)
         elif type(hist_bins) == list:
             self.hist_bins.append({
                'bins': hist_bins

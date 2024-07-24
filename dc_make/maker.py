@@ -25,6 +25,7 @@ class DatacardMaker:
     self.eras = cfg["eras"]
     self.channels = cfg["channels"]
     self.categories = cfg["categories"]
+    self.int_thr = cfg['integral_threshold']
 
     self.bins = []
     for era, channel, cat in self.ECC():
@@ -32,7 +33,6 @@ class DatacardMaker:
       self.bins.append(bin)
 
     self.model = Model.fromConfig(cfg["model"])
-    #print(self.model)
     self.param_bins = {}
     self.processes = {}
     data_process = None
@@ -80,16 +80,6 @@ class DatacardMaker:
     hist_bins = hist_bins or cfg.get("hist_bins", None)
     self.hist_binner = Binner(hist_bins)
 
-
-
-    """
-    self.hist_bins = hist_bins
-    if self.hist_bins is None:
-      self.hist_bins = cfg.get("hist_bins", None)
-    if self.hist_bins is not None:
-      self.hist_bins = listToVector(self.hist_bins, 'double')
-    """
-
     self.input_files = {}
     self.shapes = {}
 
@@ -134,13 +124,10 @@ class DatacardMaker:
         axis = hist.GetXaxis()
         hist_integral = hist.Integral(1,axis.GetNbins() + 1)
         for nbin in range(1,axis.GetNbins() + 1):
-          isImportant=False
-          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= 0.2:
-            isImportant = True
-          if len(relevant_bins) < axis.GetNbins():
-            relevant_bins.append(isImportant)
-          else:
-            relevant_bins[nbin-1] = isImportant
+          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= self.int_thr:
+            relevant_bins.append(nbin)
+          #else:
+          #  relevant_bins[nbin-1] = nbin
     return relevant_bins
 
   def getMultiValueLnUnc(self,unc,unc_name, process, era, channel, category, model_params):#, unc_name=None, unc_scale=None)
@@ -149,7 +136,6 @@ class DatacardMaker:
     if unc.getUncertaintyForProcess(process.name) != None:
       return unc.getUncertaintyForProcess(process.name)
     elif process.subprocesses:
-      #print(f"process has {process.subprocesses}")
       unc_value_tot = 0.
       yield_value_tot = 1.
       for subp in process.subprocesses:
@@ -161,7 +147,6 @@ class DatacardMaker:
         axis = subhist.GetXaxis()
         yield_subproc = subhist.Integral(1,axis.GetNbins() + 1)
         unc_value = unc.getUncertaintyForProcess(subp)
-        #print(f"got {unc_name} for {subp} with yield {yield_subproc} and it's {unc_value}")
         if unc_value != None:
           if yield_subproc == 0 : continue
           unc_value_tot+=unc_value*yield_subproc
@@ -170,7 +155,6 @@ class DatacardMaker:
         return unc_value_tot/yield_value_tot
       return None
     return None
-    #  uAB = ( uA * A + uB * B ) / AB
 
 
   def getShape(self, process, era, channel, category, model_params, unc_name=None, unc_scale=None):
@@ -212,11 +196,8 @@ class DatacardMaker:
           raise RuntimeError(f"hist list is empty for file {file.GetName()}")
         hist = hists[0]
         if len(hists)>1:
-          #objsToMerge = ROOT.TList()
           for histy in hists[1:]:
             hist.Add(histy)
-            #objsToMerge.Add(histy)
-          #hist.Merge(objsToMerge)
         hist.SetName(process.name)
         hist.SetTitle(process.name)
 
@@ -283,7 +264,6 @@ class DatacardMaker:
 
   def addUncertainty(self, unc_name):
     unc = self.uncertainties[unc_name]
-    #print(f"unc name is {unc_name}")
     isMVLnUnc = isinstance(unc, MultiValueLnNUncertainty)
     for proc, param_str, era, channel, category in self.PPECC():
       process = self.processes[proc]
@@ -293,7 +273,6 @@ class DatacardMaker:
         unc_value = self.getMultiValueLnUnc(unc,unc_name,process, era, channel, category, model_params)#, unc_name=None, unc_scale=None
 
       uncApplies = unc_value != None if isMVLnUnc else unc.appliesTo(process, era, channel, category)
-      #print(f"unc applies? {uncApplies}")
       if not uncApplies: continue
       if not process.hasCompatibleModelParams(model_params, self.model.param_dependent_bkg): continue
 
