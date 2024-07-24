@@ -150,7 +150,7 @@ class DatacardMaker:
         if unc_value != None:
           if yield_subproc == 0 : continue
           unc_value_tot+=unc_value*yield_subproc
-          yield_value_tot*=yield_subproc
+          yield_value_tot+=yield_subproc
       if unc_value_tot != 0.:
         return unc_value_tot/yield_value_tot
       return None
