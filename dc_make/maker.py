@@ -25,7 +25,7 @@ class DatacardMaker:
     self.eras = cfg["eras"]
     self.channels = cfg["channels"]
     self.categories = cfg["categories"]
-    self.int_thr = cfg['integral_threshold']
+    self.signalFractionForRelevantBins = cfg['signalFractionForRelevantBins']
 
     self.bins = []
     for era, channel, cat in self.ECC():
@@ -119,16 +119,14 @@ class DatacardMaker:
     return file_name, self.input_files[file_name]
 
   def getRelevantBins(self, era, channel, category,signal_processes_histograms,unc_name=None, unc_scale=None, model_params=None):
-    relevant_bins = []
+    relevant_bins = set()
     for hist in signal_processes_histograms:
         axis = hist.GetXaxis()
         hist_integral = hist.Integral(1,axis.GetNbins() + 1)
         for nbin in range(1,axis.GetNbins() + 1):
-          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= self.int_thr:
+          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= self.signalFractionForRelevantBins:
             relevant_bins.append(nbin)
-          #else:
-          #  relevant_bins[nbin-1] = nbin
-    return relevant_bins
+    return list(relevant_bins)
 
   def getMultiValueLnUnc(self,unc,unc_name, process, era, channel, category, model_params):#, unc_name=None, unc_scale=None)
     file_name, file = self.getInputFile(era, model_params)

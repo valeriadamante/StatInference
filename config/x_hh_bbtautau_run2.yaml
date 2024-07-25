@@ -18,7 +18,7 @@ categories:
   - res1b
   - res2b
   - boosted
-integral_threshold: 0.2
+signalFractionForRelevantBins: 0.2
 processes:
   - process: data_obs
     is_data: true
@@ -1200,148 +1200,54 @@ uncertainties:
     categories:
     - res1b
     - res2b
-
-  #- name: CMS_eff_m_highpt_id_HighPtID_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_highpt_id_HighPtID_2017
-  #  type: auto
-  #  eras:
-  ##- Run_2017
-  #- name: CMS_eff_m_highpt_id_HighPtID_2016
-  #  type: auto
-  #  eras:
-  ##- Run_2016
-  #- name: CMS_eff_m_highpt_id_HighPtID_2016_HIPM
-  #  type: auto
-  #  eras:
-  ##- Run_2016_HIPM
-  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2018
-  #  type: auto
-  #  eras:
-  ##- Run_2018
-  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2017
-  #  type: auto
-  #  eras:
-  ##- Run_2017
-  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2016
-  #  type: auto
-  #  eras:
-  ##- Run_2016
-  #- name: CMS_eff_m_highpt_id_HighPtIDIso_2016_HIPM
-  #  type: auto
-  #  eras:
-  ##- Run_2016_HIPM
-  #- name: CMS_eff_m_highpt_id_Reco_2018
-  #  type: auto
-  #  eras:
-  ##- Run_2018
-  #- name: CMS_eff_m_highpt_id_Reco_2017
-  #  type: auto
-  #  eras:
-  ##- Run_2017
-  #- name: CMS_eff_m_highpt_id_Reco_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_highpt_id_Reco_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
-  #- name: CMS_eff_m_highpt_id_TightID_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_highpt_id_TightID_2017
-  #  type: auto
-  #  eras:
-  #- Run_2017
-  #- name: CMS_eff_m_highpt_id_TightID_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_highpt_id_TightID_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
-  #- name: CMS_eff_m_id_highptid
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_id_highpti7
-  #  type: auto
-  #  eras: ["20187]
-  #- name: #CMS_eff_m_id_highpti6
-  #  type: auto
-  #  eras: ["20186]
-  #- name: #CMS_eff_m_id_highpti6_HIPM
-  #  type: auto
-  #  eras: ["20186_HIPM]
-  #- name: #CMS_eff_m_id_HighPtIso_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_id_HighPtIso_2017
-  #  type: auto
-  #  eras:
-  #- Run_2017
-  #- name: CMS_eff_m_id_HighPtIso_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_id_HighPtIso_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
-  #- name: CMS_eff_m_id_Reco_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_id_Reco_2017
-  #  type: auto
-  #  eras:
-  #- Run_2017
-  #- name: CMS_eff_m_id_Reco_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_id_Reco_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
-  #- name: CMS_eff_m_id_TightID_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_id_TightID_2017
-  #  type: auto
-  #  eras:
-  #- Run_2017
-  #- name: CMS_eff_m_id_TightID_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_id_TightID_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
-  #- name: CMS_eff_m_id_TightIDIso_2018
-  #  type: auto
-  #  eras:
-  #- Run_2018
-  #- name: CMS_eff_m_id_TightIDIso_2017
-  #  type: auto
-  #  eras:
-  #- Run_2017
-  #- name: CMS_eff_m_id_TightIDIso_2016
-  #  type: auto
-  #  eras:
-  #- Run_2016
-  #- name: CMS_eff_m_id_TightIDIso_2016_HIPM
-  #  type: auto
-  #  eras:
-  #- Run_2016_HIPM
+  - name: CMS_eff_m_id_Reco_2018
+    type: auto
+    eras:
+    - Run_2018
+  - name: CMS_eff_m_id_Reco_2017
+    type: auto
+    eras:
+    - Run_2017
+  - name: CMS_eff_m_id_Reco_2016
+    type: auto
+    eras:
+    - Run_2016
+  - name: CMS_eff_m_id_Reco_2016_HIPM
+    type: auto
+    eras:
+    - Run_2016_HIPM
+  - name: CMS_eff_m_id_TightID_2018
+    type: auto
+    eras:
+    - Run_2018
+  - name: CMS_eff_m_id_TightID_2017
+    type: auto
+    eras:
+    - Run_2017
+  - name: CMS_eff_m_id_TightID_2016
+    type: auto
+    eras:
+    - Run_2016
+  - name: CMS_eff_m_id_TightID_2016_HIPM
+    type: auto
+    eras:
+    - Run_2016_HIPM
+  - name: CMS_eff_m_id_TightIDIso_2018
+    type: auto
+    eras:
+    - Run_2018
+  - name: CMS_eff_m_id_TightIDIso_2017
+    type: auto
+    eras:
+    - Run_2017
+  - name: CMS_eff_m_id_TightIDIso_2016
+    type: auto
+    eras:
+    - Run_2016
+  - name: CMS_eff_m_id_TightIDIso_2016_HIPM
+    type: auto
+    eras:
+    - Run_2016_HIPM
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
