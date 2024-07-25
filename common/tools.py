@@ -94,6 +94,16 @@ def rebinAndFill(new_hist, old_hist, epsilon=1e-7):
         add_bin_content(bin_old, bin_new)
 
 
+def getRelevantBins(era, channel, category,signal_processes_histograms,signalFractionForRelevantBins,unc_name=None, unc_scale=None, model_params=None):
+    relevant_bins = set()
+    for hist in signal_processes_histograms:
+        axis = hist.GetXaxis()
+        hist_integral = hist.Integral(1,axis.GetNbins() + 1)
+        for nbin in range(1,axis.GetNbins() + 1):
+          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= signalFractionForRelevantBins:
+            relevant_bins.add(nbin)
+    return list(relevant_bins)
+
 
 def th1ToNumpy(histogram, include_overflow=False):
     bin_range = (0, histogram.GetNbinsX() + 1) if include_overflow else (1, histogram.GetNbinsX())

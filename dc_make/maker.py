@@ -5,7 +5,7 @@ import yaml
 
 from CombineHarvester.CombineTools.ch import CombineHarvester
 
-from StatInference.common.tools import listToVector, rebinAndFill, importROOT, resolveNegativeBins
+from StatInference.common.tools import listToVector, rebinAndFill, importROOT, resolveNegativeBins, getRelevantBins
 from .process import Process
 from .uncertainty import Uncertainty, UncertaintyType, UncertaintyScale, MultiValueLnNUncertainty
 from .model import Model
@@ -118,15 +118,6 @@ class DatacardMaker:
       self.input_files[file_name] = file
     return file_name, self.input_files[file_name]
 
-  def getRelevantBins(self, era, channel, category,signal_processes_histograms,unc_name=None, unc_scale=None, model_params=None):
-    relevant_bins = set()
-    for hist in signal_processes_histograms:
-        axis = hist.GetXaxis()
-        hist_integral = hist.Integral(1,axis.GetNbins() + 1)
-        for nbin in range(1,axis.GetNbins() + 1):
-          if hist_integral !=0 and hist.GetBinContent(nbin) / hist_integral >= self.signalFractionForRelevantBins:
-            relevant_bins.append(nbin)
-    return list(relevant_bins)
 
   def getMultiValueLnUnc(self,unc,unc_name, process, era, channel, category, model_params):#, unc_name=None, unc_scale=None)
     file_name, file = self.getInputFile(era, model_params)
@@ -135,7 +126,7 @@ class DatacardMaker:
       return unc.getUncertaintyForProcess(process.name)
     elif process.subprocesses:
       unc_value_tot = 0.
-      yield_value_tot = 1.
+      yield_value_tot = 0.
       for subp in process.subprocesses:
         hist_name = f"{channel}/{category}/{subp}"
         subhist = file.Get(hist_name)
@@ -205,7 +196,7 @@ class DatacardMaker:
         if process.is_signal:
             signal_processes_histograms.append(hist)
         else:
-          relevant_bins = self.getRelevantBins(era, channel, category,signal_processes_histograms,unc_name, unc_scale, model_params)
+          relevant_bins = getRelevantBins(era, channel, category,signal_processes_histograms,self.signalFractionForRelevantBins,unc_name, unc_scale, model_params)
           solution = resolveNegativeBins(hist,relevant_bins=relevant_bins, allow_zero_integral=process.allow_zero_integral, allow_negative_bins_within_error=process.allow_negative_bins_within_error, max_n_sigma_for_negative_bins=process.max_n_sigma_for_negative_bins, allow_negative_integral=process.allow_negative_integral)
 
           if not solution.accepted:
