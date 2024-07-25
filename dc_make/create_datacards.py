@@ -38,4 +38,3 @@ if __name__ == "__main__":
   maker = DatacardMaker(args.config, args.input, hist_bins=hist_bins, param_values=param_values)
   maker.createDatacards(args.output)
 
-

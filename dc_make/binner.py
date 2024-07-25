@@ -12,11 +12,11 @@ class Binner:
         elif type(hist_bins) == list:
             self.hist_bins.append({
                'bins': hist_bins
-            })           
+            })
         elif hist_bins is not None:
             raise RuntimeError("Incompatible hist_bins format")
         for entry in self.hist_bins:
-           entry['bins'] = listToVector(entry['bins'], 'double')
+            entry['bins'] = listToVector(entry['bins'], 'double')
 
     def applyBinning(self, era, channel, category, model_params, hist):
         if len(self.hist_bins) == 0:
@@ -26,9 +26,9 @@ class Binner:
             if not ('eras' not in entry or era in entry['eras']): return False
             if not ('channels' not in entry or channel in entry['channels']): return False
             if not ('categories' not in entry or category in entry['categories']): return False
-
-            for param_key, param_value in model_params.items():
-                if not (param_key not in entry or param_value in entry[param_key]): return False
+            if model_params is not None:
+                for param_key, param_value in model_params.items():
+                    if not (param_key not in entry or param_value in entry[param_key]): return False
             return True
 
         for entry in self.hist_bins:
