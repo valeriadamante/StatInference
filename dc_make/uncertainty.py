@@ -176,7 +176,9 @@ class LnNUncertainty(Uncertainty):
 
   def valueToMap(self, digits=3):
     if type(self.value) == float:
-      value = round(1 + self.value, digits)
+      v_up = round(1 + self.value, digits)
+      v_down = 0.01
+      value = (v_down, v_up) if value < 1 else v_up
     else:
       v_down = round(1 + self.value[UncertaintyScale.Down], digits)
       v_up = round(1 + self.value[UncertaintyScale.Up], digits)
