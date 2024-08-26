@@ -4,7 +4,8 @@ model:
   parameters: [ MX ]
   param_dependent_bkg: true
   input_file_pattern: ${ERA}/shape_m${MX}.root
-hist_bins: [ 0, 0.7, 1 ]
+hist_bins: [ 0, 0.3, 1 ]
+signalFractionForRelevantBins: 0.2
 eras:
   - Run3_2022
 channels:
