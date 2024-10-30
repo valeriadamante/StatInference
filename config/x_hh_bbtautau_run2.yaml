@@ -1381,65 +1381,98 @@ uncertainties:
     - Run_2016_HIPM
   - name: CMS_pnet_2018
     type: auto
+    categories:
+    - boosted_cat3_masswindow
     eras:
     - Run_2018
   - name: CMS_pnet_2017
     type: auto
+    categories:
+    - boosted_cat3_masswindow
     eras:
     - Run_2017
   - name: CMS_pnet_2016
     type: auto
+    categories:
+    - boosted_cat3_masswindow
     eras:
     - Run_2016
   - name: CMS_pnet_2016_HIPM
     type: auto
+    categories:
+    - boosted_cat3_masswindow
     eras:
-    - Run_2016_HIPM  - name: CMS_bbtt_trig_diTau_DM0_2018
+    - Run_2016_HIPM
+  - name: CMS_bbtt_trig_diTau_DM0_2018
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_diTau_DM0_2017
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_diTau_DM0_2016
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_diTau_DM0_2016_HIPM
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_diTau_DM1_2018
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_diTau_DM1_2017
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_diTau_DM1_2016
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_diTau_DM1_2016_HIPM
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_diTau_3Prong_2018
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_diTau_3Prong_2017
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_diTau_3Prong_2016
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_diTau_3Prong_2016_HIPM
     type: auto
+    channels:
+    - tauTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_singleTau_2018
@@ -1458,186 +1491,263 @@ uncertainties:
     type: auto
     eras:
     - Run_2016_HIPM
-  - name: CMS_bbtt_trig_singleEle_2018
-    type: auto
-    eras:
-    - Run_2018
-  - name: CMS_bbtt_trig_singleEle_2017
-    type: auto
-    eras:
-    - Run_2017
-  - name: CMS_bbtt_trig_singleEle_2016
-    type: auto
-    eras:
-    - Run_2016
-  - name: CMS_bbtt_trig_singleEle_2016_HIPM
-    type: auto
-    eras:
-    - Run_2016_HIPM
-  - name: CMS_bbtt_trig_singleMu_2018
-    type: auto
-    eras:
-    - Run_2018
-  - name: CMS_bbtt_trig_singleMu_2017
-    type: auto
-    eras:
-    - Run_2017
-  - name: CMS_bbtt_trig_singleMu_2016
-    type: auto
-    eras:
-    - Run_2016
-  - name: CMS_bbtt_trig_singleMu_2016_HIPM
-    type: auto
-    eras:
-    - Run_2016_HIPM
-  - name: CMS_bbtt_trig_eMu_2018
-    type: auto
-    eras:
-    - Run_2018
-  - name: CMS_bbtt_trig_eMu_2017
-    type: auto
-    eras:
-    - Run_2017
-  - name: CMS_bbtt_trig_eMu_2016
-    type: auto
-    eras:
-    - Run_2016
-  - name: CMS_bbtt_trig_eMu_2016_HIPM
-    type: auto
-    eras:
-    - Run_2016_HIPM
+  # - name: CMS_bbtt_trig_singleEle_2018
+  #   type: auto
+  #   channels:
+  #   - eTau
+  #   eras:
+  #   - Run_2018
+  # - name: CMS_bbtt_trig_singleEle_2017
+  #   type: auto
+  #   channels:
+  #   - eTau
+  #   eras:
+  #   - Run_2017
+  # - name: CMS_bbtt_trig_singleEle_2016
+  #   type: auto
+  #   channels:
+  #   - eTau
+  #   eras:
+  #   - Run_2016
+  # - name: CMS_bbtt_trig_singleEle_2016_HIPM
+  #   type: auto
+  #   channels:
+  #   - eTau
+  #   eras:
+  #   - Run_2016_HIPM
+  # - name: CMS_bbtt_trig_singleMu_2018
+  #   type: auto
+  #   channels:
+  #   - muTau
+  #   eras:
+  #   - Run_2018
+  # - name: CMS_bbtt_trig_singleMu_2017
+  #   type: auto
+  #   channels:
+  #   - muTau
+  #   eras:
+  #   - Run_2017
+  # - name: CMS_bbtt_trig_singleMu_2016
+  #   type: auto
+  #   channels:
+  #   - muTau
+  #   eras:
+  #   - Run_2016
+  # - name: CMS_bbtt_trig_singleMu_2016_HIPM
+  #   type: auto
+  #   channels:
+  #   - muTau
+  #   eras:
+  #   - Run_2016_HIPM
+
   - name: CMS_bbtt_trig_eTau_cross_ele_2018
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_eTau_cross_ele_2017
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_eTau_cross_ele_2016
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_eTau_cross_ele_2016_HIPM
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_eTau_SL_ele_2018
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_eTau_SL_ele_2017
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_eTau_SL_ele_2016
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_eTau_SL_ele_2016_HIPM
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_eTau_cross_tau_2018
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_eTau_cross_tau_2017
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_eTau_cross_tau_2016
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_eTau_cross_tau_2016_HIPM
     type: auto
+    channels:
+    - eTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_muTau_cross_mu_2018
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_muTau_cross_mu_2017
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_muTau_cross_mu_2016
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_muTau_cross_mu_2016_HIPM
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_muTau_SL_mu_2018
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_muTau_SL_mu_2017
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_muTau_SL_mu_2016
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_muTau_SL_mu_2016_HIPM
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_muTau_cross_tau_2018
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2018
   - name: CMS_bbtt_trig_muTau_cross_tau_2017
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2017
   - name: CMS_bbtt_trig_muTau_cross_tau_2016
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016
   - name: CMS_bbtt_trig_muTau_cross_tau_2016_HIPM
     type: auto
+    channels:
+    - muTau
     eras:
     - Run_2016_HIPM
   - name: CMS_bbtt_trig_MET_2018
     type: auto
-    era: Run_2018
+    eras:
+    - Run_2018
   - name: CMS_bbtt_trg_eTau_ele_2018
     type: auto
-    era: Run_2018
+    channels:
+    - eTau
+    eras:
+    - Run_2018
   - name: CMS_bbtt_trg_muTau_mu_2018
     type: auto
-    era: Run_2018
+    channels:
+    - muTau
+    eras:
+    - Run_2018
   - name: CMS_bbtt_trig_MET_2017
     type: auto
-    era: Run_2017
+    eras:
+    - Run_2017
   - name: CMS_bbtt_trg_eTau_ele_2017
     type: auto
-    era: Run_2017
+    channels:
+    - eTau
+    eras:
+    - Run_2017
   - name: CMS_bbtt_trg_muTau_mu_2017
     type: auto
-    era: Run_2017
+    channels:
+    - muTau
+    eras:
+    - Run_2017
   - name: CMS_bbtt_trig_MET_2016
     type: auto
-    era: Run_2016
+    eras:
+    - Run_2016
   - name: CMS_bbtt_trg_eTau_ele_2016
     type: auto
-    era: Run_2016
+    channels:
+    - eTau
+    eras:
+    - Run_2016
   - name: CMS_bbtt_trg_muTau_mu_2016
     type: auto
-    era: Run_2016
+    channels:
+    - muTau
+    eras:
+    - Run_2016
   - name: CMS_bbtt_trig_MET_2016_HIPM
     type: auto
-    era: Run_2016_HIPM
+    eras:
+    - Run_2016_HIPM
   - name: CMS_bbtt_trg_eTau_ele_2016_HIPM
     type: auto
-    era: Run_2016_HIPM
+    channels:
+    - eTau
+    eras:
+    - Run_2016_HIPM
   - name: CMS_bbtt_trg_muTau_mu_2016_HIPM
     type: auto
-    era: Run_2016_HIPM
+    channels:
+    - muTau
+    eras:
+    - Run_2016_HIPM
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
