@@ -41,6 +41,7 @@ processes:
   - process: ST
     allow_zero_integral: True
     allow_negative_bins_within_error: True
+    max_n_sigma_for_negative_bins: 1.2
     subprocesses:
     - ST_tW_antitop_5f_InclusiveDecays
     - ST_tW_top_5f_InclusiveDecays
